@@ -21,6 +21,7 @@
       --border: #cccccc;
       --accent: #e65100;
       --danger: #d32f2f;
+      --blue: #1565c0;
     }
     * {
       box-sizing: border-box;
@@ -133,7 +134,7 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* MODAL BOTTOM SHEET */
+    /* MODAL */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -149,7 +150,7 @@
       padding: 18px 16px 24px;
       width: 100%;
       max-width: 480px;
-      max-height: 85vh;
+      max-height: 88vh;
       overflow-y: auto;
       box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
       animation: slideUp 0.25s ease-out;
@@ -164,11 +165,13 @@
       border-radius: 14px;
       padding: 20px;
       width: 90%;
-      max-width: 330px;
+      max-width: 340px;
       margin: auto;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
-    .cart-items { max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .cart-items { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
     .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
     .cart-qty-ctrl { display: flex; align-items: center; gap: 8px; }
     .btn-circle {
@@ -191,6 +194,38 @@
       border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
     }
     .btn-quick-cash:active { background: #e0e0e0; }
+
+    /* AREA FOTO BUKTI QRIS */
+    #qris-wrapper {
+      display: none;
+      margin-top: 10px;
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      background: #fafafa;
+      text-align: center;
+    }
+    .btn-capture {
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #qris-preview-img {
+      max-width: 100%;
+      max-height: 140px;
+      border-radius: 6px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      display: none;
+    }
 
     .checkout-actions { display: flex; gap: 10px; margin-top: 14px; }
     .btn-action {
@@ -227,7 +262,7 @@
     .nav-btn.active { color: var(--primary); font-weight: 800; }
     .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
-    /* ELEMEN KARTU & FORM */
+    /* ELEMEN UMUM */
     .card { background: var(--surface); padding: 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
     .form-group { margin-bottom: 10px; }
     label { font-size: 13px; font-weight: 700; color: var(--gray); display: block; margin-bottom: 4px; }
@@ -240,7 +275,7 @@
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: #f5f5f5; font-weight: 700; }
 
-    /* HEADER KELOMPOK TANGGAL DI TABEL */
+    tr.clickable-row:active { background-color: #f1f8e9; }
     tr.group-header td {
       background: #e8f5e9;
       color: var(--primary-dark);
@@ -255,7 +290,6 @@
       border-bottom: 2px solid #ccc;
     }
 
-    /* STRUK PRINT 58MM & LAPORAN PDF */
     #receipt-area { display: none; }
     @media print {
       body * { visibility: hidden; }
@@ -289,7 +323,7 @@
       <div class="product-grid" id="pos-products"></div>
     </div>
 
-    <!-- 2. KELOLA MENU (TANPA INPUT HPP) -->
+    <!-- 2. KELOLA MENU -->
     <div id="section-produk" class="section">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Tambah / Edit Menu</h3>
@@ -318,7 +352,7 @@
       </div>
     </div>
 
-    <!-- 3. LAPORAN PENJUALAN (DIKELOMPOKKAN PER TANGGAL, TANPA OMSET/LABA) -->
+    <!-- 3. LAPORAN PENJUALAN -->
     <div id="section-laporan" class="section">
       <div class="card no-print">
         <div style="display: flex; gap: 8px;">
@@ -333,10 +367,9 @@
 
       <div class="card" style="padding-bottom: 6px;">
         <h3 style="font-size: 16px; margin-bottom: 4px;" id="report-title-display">Laporan Penjualan</h3>
-        <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b> Transaksi</p>
+        <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b> Transaksi (Klik baris untuk cek detail/foto)</p>
       </div>
 
-      <!-- Diagram Minuman Paling Laris -->
       <div class="card">
         <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Minuman Terlaris</h4>
         <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
@@ -345,7 +378,6 @@
         </div>
       </div>
 
-      <!-- Tabel Pengelompokan Berdasarkan Tanggal -->
       <div class="table-container">
         <table>
           <thead>
@@ -400,7 +432,7 @@
     </div>
   </div>
 
-  <!-- MODAL PEMBAYARAN -->
+  <!-- MODAL PEMBAYARAN DENGAN KAMERA QRIS -->
   <div id="payment-modal" class="modal-backdrop">
     <div class="modal-bottom-sheet">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
@@ -423,6 +455,7 @@
         </div>
       </div>
 
+      <!-- Area Input Tunai -->
       <div id="cash-input-wrapper">
         <div class="form-group" style="margin-top: 10px;">
           <label>Uang Tunai Diterima (Rp)</label>
@@ -445,6 +478,18 @@
         </div>
       </div>
 
+      <!-- Area Foto Kamera Bukti QRIS -->
+      <div id="qris-wrapper">
+        <label style="color: var(--primary); margin-bottom: 6px;">Foto Bukti Pembayaran QRIS:</label>
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageCapture(event)">
+        <button type="button" class="btn-capture" onclick="document.getElementById('camera-input').click()">
+          📷 Buka Kamera / Foto Bukti
+        </button>
+        <div>
+          <img id="qris-preview-img" alt="Pratinjau Bukti">
+        </div>
+      </div>
+
       <div class="checkout-actions">
         <button class="btn-action btn-save-only" onclick="processCheckout(false)">Simpan Saja</button>
         <button class="btn-action btn-save-print" onclick="processCheckout(true)">Simpan & Cetak</button>
@@ -452,7 +497,7 @@
     </div>
   </div>
 
-  <!-- MODAL NOTA DIGITAL -->
+  <!-- MODAL NOTA DIGITAL (SAAT SIMPAN SAJA) -->
   <div id="receipt-modal" class="modal-backdrop" style="align-items: center;">
     <div class="modal-dialog">
       <div style="text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
@@ -478,6 +523,36 @@
       <div style="margin-top: 16px;">
         <button class="btn-standard" style="width: 100%; padding: 12px;" onclick="closeReceiptModal()">Transaksi Baru / Selesai</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL TRANSAKSI LAPORAN (MENAMPILKAN GAMBAR QRIS) -->
+  <div id="detail-modal" class="modal-backdrop" style="align-items: center;">
+    <div class="modal-dialog">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
+        <h3 style="font-size: 16px;">Rincian Transaksi</h3>
+        <button style="border:none; background:#eee; border-radius:50%; width:26px; height:26px; font-weight:800;" onclick="closeDetailModal()">&times;</button>
+      </div>
+
+      <div style="margin-top:10px; font-size:13px; display:flex; flex-direction:column; gap:4px;">
+        <div><b>Waktu:</b> <span id="dtl-time"></span></div>
+        <div><b>Metode:</b> <span id="dtl-method" style="font-weight:700; color:var(--primary);"></span></div>
+      </div>
+
+      <div id="dtl-items" style="margin:10px 0; max-height:140px; overflow-y:auto; border-top:1px dashed #eee; border-bottom:1px dashed #eee; padding:6px 0; font-size:13px;"></div>
+
+      <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:800;">
+        <span>Total Bayar:</span>
+        <span id="dtl-total">Rp 0</span>
+      </div>
+
+      <!-- Wadah Foto Bukti QRIS di Laporan -->
+      <div id="dtl-photo-container" style="margin-top:12px; display:none; text-align:center;">
+        <label style="font-size:12px; color:var(--gray); margin-bottom:4px;">Foto Bukti Pembayaran QRIS:</label>
+        <img id="dtl-photo" style="max-width:100%; max-height:220px; border-radius:8px; border:1px solid #ccc; object-fit:contain;" alt="Bukti QRIS">
+      </div>
+
+      <button class="btn-standard" style="width:100%; margin-top:14px; background:#616161;" onclick="closeDetailModal()">Tutup</button>
     </div>
   </div>
 
@@ -631,18 +706,65 @@
     }
 
     let paymentMethod = 'cash';
+    let currentQrisPhoto = null; // Menyimpan Base64 foto QRIS
+
     function setPaymentMethod(method) {
       paymentMethod = method;
       document.getElementById('tab-cash').classList.toggle('active', method === 'cash');
       document.getElementById('tab-qris').classList.toggle('active', method === 'qris');
       
       const cashWrapper = document.getElementById('cash-input-wrapper');
+      const qrisWrapper = document.getElementById('qris-wrapper');
+
       if (method === 'qris') {
         cashWrapper.style.display = 'none';
+        qrisWrapper.style.display = 'block';
       } else {
         cashWrapper.style.display = 'block';
+        qrisWrapper.style.display = 'none';
         calcChange();
       }
+    }
+
+    /* KOMPRESI GAMBAR KAMERA (Hemat Memori Offline) */
+    function handleImageCapture(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Kompres gambar ke ukuran maksimal 600px
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 600;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Simpan sebagai string JPEG terkompresi
+          currentQrisPhoto = canvas.toDataURL('image/jpeg', 0.6);
+
+          // Tampilkan pratinjau
+          const prev = document.getElementById('qris-preview-img');
+          prev.src = currentQrisPhoto;
+          prev.style.display = 'inline-block';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     function setQuickCash(val) {
@@ -652,7 +774,7 @@
       calcChange();
     }
 
-    /* 5. CRUD PRODUK (MURNI NAMA & HARGA JUAL) */
+    /* 5. CRUD PRODUK */
     async function saveProduct() {
       const id = document.getElementById('prod-id').value;
       const name = document.getElementById('prod-name').value.trim();
@@ -713,7 +835,7 @@
       `).join('');
     }
 
-    /* 6. LOGIKA KASIR & FLOATING CART */
+    /* 6. KASIR & CHECKOUT */
     let cart = [];
 
     async function renderPosProducts() {
@@ -834,7 +956,8 @@
         items: [...cart],
         totalOmset,
         cashGiven,
-        cashChange
+        cashChange,
+        qrisPhoto: currentQrisPhoto // Simpan bukti foto jika ada
       };
 
       await addItemToStore('sales', sale);
@@ -886,17 +1009,22 @@
     function resetPOS() {
       cart = [];
       document.getElementById('cash-given').value = '';
+      currentQrisPhoto = null;
+      document.getElementById('qris-preview-img').style.display = 'none';
+      document.getElementById('qris-preview-img').src = '';
       setPaymentMethod('cash');
       renderPosProducts();
     }
 
-    /* 7. LAPORAN PENJUALAN DIKELOMPOKKAN PER TANGGAL */
+    /* 7. LAPORAN PENJUALAN & MODAL CEK TRANSAKSI */
+    let currentFilteredSales = [];
+
     async function loadReportData() {
       const type = document.getElementById('report-type').value;
       const allSales = await getAllFromStore('sales');
       const now = new Date();
 
-      const filtered = allSales.filter(s => {
+      currentFilteredSales = allSales.filter(s => {
         const d = new Date(s.timestamp);
         if (type === 'today') return d.toDateString() === now.toDateString();
         if (type === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
@@ -906,20 +1034,18 @@
 
       const titleMap = { today: 'Laporan Penjualan Hari Ini', month: 'Laporan Penjualan Bulan Ini', year: 'Laporan Penjualan Tahun Ini' };
       document.getElementById('report-title-display').textContent = titleMap[type] || 'Laporan Penjualan';
-      document.getElementById('rep-count').textContent = filtered.length;
+      document.getElementById('rep-count').textContent = currentFilteredSales.length;
 
-      // Hitung produk terlaris
       const itemCounts = {};
-      filtered.forEach(s => {
+      currentFilteredSales.forEach(s => {
         s.items.forEach(i => {
           itemCounts[i.name] = (itemCounts[i.name] || 0) + i.qty;
         });
       });
       drawDonutChart(itemCounts);
 
-      // Kelompokkan Transaksi Berdasarkan Tanggal
       const groups = {};
-      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
+      currentFilteredSales.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
         const dateKey = new Date(s.timestamp).toLocaleDateString('id-ID', {
           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
@@ -938,30 +1064,28 @@
       for (const [dateLabel, salesInDate] of Object.entries(groups)) {
         let dailyTotal = 0;
 
-        // Baris Header Tanggal
         tbody.innerHTML += `
           <tr class="group-header">
             <td colspan="4">📅 ${dateLabel}</td>
           </tr>
         `;
 
-        // Baris Transaksi
         salesInDate.forEach(s => {
           dailyTotal += s.totalOmset;
           const desc = s.items.map(i => `${i.name} (${i.qty})`).join(', ');
           const timeOnly = new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+          const hasPhotoIcon = s.qrisPhoto ? ' 📷' : '';
 
           tbody.innerHTML += `
-            <tr>
+            <tr class="clickable-row" onclick="viewTransactionDetail(${s.id})" style="cursor:pointer;">
               <td>${timeOnly}</td>
-              <td><span style="font-size:11px; padding:2px 4px; border-radius:4px; font-weight:700; background:#eee;">${s.paymentMethod || 'TUNAI'}</span></td>
+              <td><span style="font-size:11px; padding:2px 4px; border-radius:4px; font-weight:700; background:#eee;">${s.paymentMethod || 'TUNAI'}${hasPhotoIcon}</span></td>
               <td>${desc}</td>
               <td>Rp ${s.totalOmset.toLocaleString('id-ID')}</td>
             </tr>
           `;
         });
 
-        // Baris Subtotal Tanggal
         tbody.innerHTML += `
           <tr class="group-footer">
             <td colspan="3" style="text-align:right;">Subtotal:</td>
@@ -969,6 +1093,42 @@
           </tr>
         `;
       }
+    }
+
+    /* FUNGSI CEK DETAIL TRANSAKSI & BUKA GAMBAR QRIS */
+    async function viewTransactionDetail(saleId) {
+      const allSales = await getAllFromStore('sales');
+      const sale = allSales.find(s => s.id === saleId);
+      if (!sale) return;
+
+      document.getElementById('dtl-time').textContent = new Date(sale.timestamp).toLocaleString('id-ID');
+      document.getElementById('dtl-method').textContent = sale.paymentMethod;
+      document.getElementById('dtl-total').textContent = 'Rp ' + sale.totalOmset.toLocaleString('id-ID');
+
+      const itemsBox = document.getElementById('dtl-items');
+      itemsBox.innerHTML = sale.items.map(i => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>${i.name} <b>x${i.qty}</b></span>
+          <span>Rp ${(i.price * i.qty).toLocaleString('id-ID')}</span>
+        </div>
+      `).join('');
+
+      const photoContainer = document.getElementById('dtl-photo-container');
+      const photoEl = document.getElementById('dtl-photo');
+
+      if (sale.qrisPhoto) {
+        photoEl.src = sale.qrisPhoto;
+        photoContainer.style.display = 'block';
+      } else {
+        photoEl.src = '';
+        photoContainer.style.display = 'none';
+      }
+
+      document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detail-modal').style.display = 'none';
     }
 
     function drawDonutChart(counts) {
