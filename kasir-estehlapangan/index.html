@@ -21,7 +21,6 @@
       --border: #cccccc;
       --accent: #e65100;
       --danger: #d32f2f;
-      --blue: #1565c0;
     }
     * {
       box-sizing: border-box;
@@ -41,27 +40,7 @@
       font-size: 15px;
     }
 
-    /* MODAL UMUM */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.55);
-      align-items: center;
-      justify-content: center;
-      z-index: 9998;
-      padding: 16px;
-    }
-    .modal-box {
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 20px;
-      width: 100%;
-      max-width: 330px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    }
-
-    /* Header */
+    /* HEADER */
     header {
       background: var(--primary);
       color: white;
@@ -72,7 +51,6 @@
       flex-shrink: 0;
     }
     header h1 { font-size: 18px; font-weight: 700; }
-    
     .btn-refresh-cache {
       background: rgba(255,255,255,0.25);
       color: white;
@@ -88,16 +66,144 @@
     }
     .btn-refresh-cache:active { background: rgba(255,255,255,0.4); }
 
+    /* MAIN CONTAINER */
     main {
       flex: 1;
       overflow-y: auto;
-      padding: 12px;
-      padding-bottom: 80px;
+      padding: 14px;
+      padding-bottom: 120px; /* Jarak aman agar bagian bawah tidak terpotong */
     }
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Nav Bawah */
+    /* GRID MENU PRODUK DI LAYAR DEPAN */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 12px;
+    }
+    .card-product {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 96px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+      position: relative;
+    }
+    .card-product:active { background-color: #e8f5e9; transform: scale(0.96); }
+    .card-product .name { font-size: 15px; font-weight: 700; line-height: 1.25; margin-bottom: 6px; }
+    .card-product .price { font-size: 14px; color: var(--primary); font-weight: 800; }
+    .card-product .badge-qty {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 2px 7px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* FLOATING CART BAR (MUNCUL JIKA ADA PESANAN) */
+    #floating-cart-bar {
+      display: none;
+      position: fixed;
+      bottom: 70px;
+      left: 14px;
+      right: 14px;
+      background: var(--primary-dark);
+      color: white;
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      z-index: 90;
+      cursor: pointer;
+      align-items: center;
+      justify-content: space-between;
+      animation: popUp 0.2s ease-out;
+    }
+    @keyframes popUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* MODAL UMUM */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-bottom-sheet {
+      background: var(--surface);
+      border-radius: 18px 18px 0 0;
+      padding: 18px 16px 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    /* MODAL KARTU KECIL (NOTA DIGITAL & RESET) */
+    .modal-dialog {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 20px;
+      width: 90%;
+      max-width: 330px;
+      margin: auto;
+    }
+
+    /* ELEMEN DI DALAM MODAL PEMBAYARAN */
+    .cart-items { max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
+    .cart-qty-ctrl { display: flex; align-items: center; gap: 8px; }
+    .btn-circle {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border); background: #f5f5f5;
+      font-size: 16px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pay-method-selector { display: flex; gap: 8px; margin-top: 4px; }
+    .pay-tab {
+      flex: 1; padding: 10px; text-align: center; border-radius: 8px;
+      border: 1px solid var(--border); background: #fafafa;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .pay-tab.active { background: #e8f5e9; border-color: var(--primary); color: var(--primary-dark); }
+
+    .quick-cash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+    .btn-quick-cash {
+      padding: 8px 4px; background: #f1f3f4; border: 1px solid #dcdcdc;
+      border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .btn-quick-cash:active { background: #e0e0e0; }
+
+    .checkout-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-action {
+      flex: 1; padding: 13px 8px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .btn-save-only { background: #f57c00; color: white; }
+    .btn-save-print { background: var(--primary); color: white; }
+
+    /* NAV BAWAH */
     nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -105,7 +211,7 @@
       background: var(--surface);
       display: flex;
       border-top: 1px solid var(--border);
-      z-index: 100;
+      z-index: 80;
     }
     .nav-btn {
       flex: 1;
@@ -124,99 +230,21 @@
     .nav-btn.active { color: var(--primary); font-weight: 800; }
     .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
-    /* Grid Menu POS */
-    .pos-layout { display: flex; flex-direction: column; gap: 14px; }
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 10px;
-    }
-    .card-product {
-      background: var(--surface);
-      border-radius: 10px;
-      padding: 14px 8px;
-      text-align: center;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 90px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    .card-product:active { background-color: #e8f5e9; transform: scale(0.96); }
-    .card-product .name { font-size: 15px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
-    .card-product .price { font-size: 14px; color: var(--primary); font-weight: 800; }
-
-    /* Keranjang */
-    .cart-box {
-      background: var(--surface);
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .cart-items { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-    .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
-    .cart-qty-ctrl { display: flex; align-items: center; gap: 8px; }
-    .btn-circle {
-      width: 28px; height: 28px; border-radius: 50%;
-      border: 1px solid var(--border); background: #f5f5f5;
-      font-size: 16px; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .cart-total-box {
-      border-top: 2px solid var(--border);
-      padding-top: 8px;
-      display: flex; justify-content: space-between;
-      font-size: 17px; font-weight: 800;
-    }
-
-    /* Pembayaran Tunai & QRIS */
-    .pay-method-selector { display: flex; gap: 8px; margin-top: 2px; }
-    .pay-tab {
-      flex: 1; padding: 9px; text-align: center; border-radius: 8px;
-      border: 1px solid var(--border); background: #fafafa;
-      font-size: 13px; font-weight: 700; cursor: pointer;
-    }
-    .pay-tab.active { background: #e8f5e9; border-color: var(--primary); color: var(--primary-dark); }
-
-    /* Template Pecahan */
-    .quick-cash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-    .btn-quick-cash {
-      padding: 8px 4px; background: #f1f3f4; border: 1px solid #dcdcdc;
-      border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
-    }
-    .btn-quick-cash:active { background: #e0e0e0; }
-
-    /* Tombol Kasir */
-    .checkout-actions { display: flex; gap: 10px; margin-top: 6px; }
-    .btn-action {
-      flex: 1; padding: 13px 8px; border: none; border-radius: 8px;
-      font-size: 14px; font-weight: 700; cursor: pointer; text-align: center;
-    }
-    .btn-save-only { background: #f57c00; color: white; }
-    .btn-save-only:active { background: #e65100; }
-    .btn-save-print { background: var(--primary); color: white; }
-    .btn-save-print:active { background: var(--primary-dark); }
-
-    /* Elemen Umum */
+    /* ELEMEN UMUM */
     .card { background: var(--surface); padding: 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
     .form-group { margin-bottom: 10px; }
     label { font-size: 13px; font-weight: 700; color: var(--gray); display: block; margin-bottom: 4px; }
     input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
     .btn-standard { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .btn-danger { background: var(--danger); color: white; border: none; padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-danger { background: var(--danger); color: white; border: none; padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
     .table-container { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow-x: auto; margin-top: 10px; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: #f5f5f5; font-weight: 700; }
 
+    /* STRUK PRINT 58MM */
     #receipt-area { display: none; }
-
     @media print {
       body * { visibility: hidden; }
       body.printing-receipt #receipt-area, body.printing-receipt #receipt-area * { visibility: visible; }
@@ -233,36 +261,7 @@
 </head>
 <body>
 
-  <!-- MODAL DIGITAL NOTA (SAAT SIMPAN SAJA) -->
-  <div id="receipt-modal" class="modal-backdrop">
-    <div class="modal-box">
-      <div style="text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
-        <h3 style="font-size: 17px;">BOOTH ES TEH</h3>
-        <p style="font-size: 12px; color: var(--gray);" id="modal-rec-time"></p>
-        <span style="display:inline-block; font-size:11px; padding:2px 8px; border-radius:4px; margin-top:4px; font-weight:700; background:#e8f5e9; color:var(--primary);" id="modal-rec-method">TUNAI</span>
-      </div>
-      
-      <div id="modal-rec-items" style="max-height:160px; overflow-y:auto; margin: 10px 0; font-size: 13px; display:flex; flex-direction:column; gap:5px;"></div>
-      
-      <div style="border-top: 1px dashed var(--border); padding-top: 8px; font-size: 14px; display:flex; flex-direction:column; gap:4px;">
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px;">
-          <span>Total:</span><span id="modal-rec-total">Rp 0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between;">
-          <span style="color:var(--gray);">Diterima:</span><span id="modal-rec-cash">Rp 0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--accent);">
-          <span>Kembalian:</span><span id="modal-rec-change">Rp 0</span>
-        </div>
-      </div>
-
-      <div style="margin-top: 16px;">
-        <button class="btn-standard" style="width: 100%; padding: 12px;" onclick="closeReceiptModal()">Transaksi Baru / Selesai</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- HEADER DENGAN TOMBOL CLEAR CACHE -->
+  <!-- HEADER -->
   <header>
     <h1 id="page-title">Booth Es Teh</h1>
     <button class="btn-refresh-cache" onclick="hardClearCache()">
@@ -272,66 +271,13 @@
   </header>
 
   <main>
-    <!-- 1. KASIR -->
+    <!-- 1. SECTION KASIR (BERSIH HANYA KATALOG PRODUK) -->
     <div id="section-kasir" class="section active">
-      <div class="pos-layout">
-        <div>
-          <h3 style="font-size: 15px; margin-bottom: 8px; color: var(--gray);">Pilih Menu Minuman</h3>
-          <div class="product-grid" id="pos-products"></div>
-        </div>
-
-        <div class="cart-box">
-          <div style="font-size: 16px; font-weight: 800; border-bottom: 1px solid var(--border); padding-bottom: 6px;">Pesanan Saat Ini</div>
-          <div class="cart-items" id="cart-list">
-            <p style="color:var(--gray); font-size:14px; text-align:center; padding:12px;">Keranjang kosong</p>
-          </div>
-          
-          <div class="cart-total-box">
-            <span>Total Tagihan:</span>
-            <span id="cart-total-display">Rp 0</span>
-          </div>
-
-          <!-- Pilihan Pembayaran Tunai & QRIS -->
-          <div style="margin-top: 4px;">
-            <label>Metode Pembayaran</label>
-            <div class="pay-method-selector">
-              <div class="pay-tab active" id="tab-cash" onclick="setPaymentMethod('cash')">Tunai (Cash)</div>
-              <div class="pay-tab" id="tab-qris" onclick="setPaymentMethod('qris')">QRIS / Non-Tunai</div>
-            </div>
-          </div>
-
-          <!-- Input Uang Tunai -->
-          <div id="cash-input-wrapper">
-            <div class="form-group" style="margin-top: 8px;">
-              <label>Uang Tunai Diterima (Rp)</label>
-              <input type="text" inputmode="numeric" id="cash-given" placeholder="0" oninput="handleCashInput(this)">
-            </div>
-
-            <label style="margin-bottom: 2px;">Pilihan Cepat Nominal:</label>
-            <div class="quick-cash-grid">
-              <button class="btn-quick-cash" onclick="setQuickCash('exact')">Uang Pas</button>
-              <button class="btn-quick-cash" onclick="setQuickCash(5000)">5.000</button>
-              <button class="btn-quick-cash" onclick="setQuickCash(10000)">10.000</button>
-              <button class="btn-quick-cash" onclick="setQuickCash(20000)">20.000</button>
-              <button class="btn-quick-cash" onclick="setQuickCash(50000)">50.000</button>
-              <button class="btn-quick-cash" onclick="setQuickCash(100000)">100.000</button>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin-top:10px;">
-              <span>Uang Kembalian:</span>
-              <span id="cash-change-display">Rp 0</span>
-            </div>
-          </div>
-
-          <div class="checkout-actions">
-            <button class="btn-action btn-save-only" onclick="processCheckout(false)">Simpan Saja</button>
-            <button class="btn-action btn-save-print" onclick="processCheckout(true)">Simpan & Cetak</button>
-          </div>
-        </div>
-      </div>
+      <h3 style="font-size: 15px; margin-bottom: 10px; color: var(--gray);">Sentuh Menu untuk Menambahkan:</h3>
+      <div class="product-grid" id="pos-products"></div>
     </div>
 
-    <!-- 2. PRODUK -->
+    <!-- 2. SECTION MENU / PRODUK -->
     <div id="section-produk" class="section">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Kelola Menu Minuman</h3>
@@ -366,7 +312,7 @@
       </div>
     </div>
 
-    <!-- 3. LAPORAN -->
+    <!-- 3. SECTION LAPORAN -->
     <div id="section-laporan" class="section">
       <div class="card no-print">
         <div style="display: flex; gap: 8px;">
@@ -412,7 +358,7 @@
       </div>
     </div>
 
-    <!-- 4. DATA & SETTING -->
+    <!-- 4. SECTION DATA & SETTING (DILENGKAPI TOMBOL RESET PRODUK) -->
     <div id="section-setting" class="section">
       <div class="card">
         <h3 style="font-size: 16px; margin-bottom: 8px;">Cadangkan & Pulihkan</h3>
@@ -426,17 +372,124 @@
         </div>
       </div>
 
-      <!-- RESET DATA TRANSAKSI -->
+      <!-- RESET MENU PRODUK -->
+      <div class="card" style="border: 1px solid #ffe082; background: #fffdf6;">
+        <h3 style="font-size: 16px; margin-bottom: 6px; color: #f57f17;">Reset Data Barang Dagangan</h3>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">
+          Menghapus semua menu minuman yang ada dan mengembalikannya ke daftar menu standar bawaan booth.
+        </p>
+        <button class="btn-standard" style="background:#fbc02d; color:#000;" onclick="resetProductsData()">Reset Menu Dagangan</button>
+      </div>
+
+      <!-- RESET RIWAYAT TRANSAKSI -->
       <div class="card" style="border: 1px solid #ef9a9a; background: #fffbfb;">
         <h3 style="font-size: 16px; margin-bottom: 6px; color: var(--danger);">Reset Data Transaksi</h3>
         <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">
-          Menghapus semua riwayat omset dan laporan keuangan (misal: saat tutup buku/bulan baru). <b>Daftar menu produk tidak akan terhapus.</b>
+          Menghapus semua riwayat omset dan laporan transaksi (tutup buku). <b>Daftar menu minuman tidak akan terhapus.</b>
         </p>
         <button class="btn-danger" onclick="resetSalesData()">Hapus Semua Transaksi</button>
       </div>
     </div>
   </main>
 
+  <!-- BILAH KERANJANG MELAYANG (FLOATING CART) -->
+  <div id="floating-cart-bar" onclick="openPaymentModal()">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span id="floating-cart-count" style="background: var(--accent); padding: 3px 9px; border-radius: 12px; font-weight: 800; font-size: 13px;">0 Item</span>
+      <span style="font-size: 14px; opacity: 0.9;">Total:</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span id="floating-cart-total" style="font-size: 17px; font-weight: 800;">Rp 0</span>
+      <span style="font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.25); padding: 4px 8px; border-radius: 6px;">Bayar &rarr;</span>
+    </div>
+  </div>
+
+  <!-- MODAL BOTTOM SHEET PEMBAYARAN -->
+  <div id="payment-modal" class="modal-backdrop">
+    <div class="modal-bottom-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 17px; font-weight: 800;">Rincian Pesanan & Pembayaran</h3>
+        <button style="border: none; background: #e0e0e0; border-radius: 50%; width: 28px; height: 28px; font-weight: 800; cursor: pointer;" onclick="closePaymentModal()">&times;</button>
+      </div>
+
+      <!-- Rincian Item di Keranjang -->
+      <div class="cart-items" id="cart-list"></div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; padding: 8px 0; border-top: 2px solid var(--border);">
+        <span>Total Tagihan:</span>
+        <span id="cart-total-display">Rp 0</span>
+      </div>
+
+      <!-- Pilihan Tunai / QRIS -->
+      <div style="margin-top: 8px;">
+        <label>Metode Pembayaran</label>
+        <div class="pay-method-selector">
+          <div class="pay-tab active" id="tab-cash" onclick="setPaymentMethod('cash')">Tunai (Cash)</div>
+          <div class="pay-tab" id="tab-qris" onclick="setPaymentMethod('qris')">QRIS / Non-Tunai</div>
+        </div>
+      </div>
+
+      <!-- Area Tunai -->
+      <div id="cash-input-wrapper">
+        <div class="form-group" style="margin-top: 10px;">
+          <label>Uang Tunai Diterima (Rp)</label>
+          <input type="text" inputmode="numeric" id="cash-given" placeholder="0" oninput="handleCashInput(this)">
+        </div>
+
+        <label style="margin-bottom: 2px;">Pilihan Cepat Nominal:</label>
+        <div class="quick-cash-grid">
+          <button class="btn-quick-cash" onclick="setQuickCash('exact')">Uang Pas</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(5000)">5.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(10000)">10.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(20000)">20.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(50000)">50.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(100000)">100.000</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:12px;">
+          <span>Uang Kembalian:</span>
+          <span id="cash-change-display">Rp 0</span>
+        </div>
+      </div>
+
+      <!-- Tombol Simpan -->
+      <div class="checkout-actions">
+        <button class="btn-action btn-save-only" onclick="processCheckout(false)">Simpan Saja</button>
+        <button class="btn-action btn-save-print" onclick="processCheckout(true)">Simpan & Cetak</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NOTA DIGITAL (SAAT SIMPAN SAJA) -->
+  <div id="receipt-modal" class="modal-backdrop" style="align-items: center;">
+    <div class="modal-dialog">
+      <div style="text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 17px;">BOOTH ES TEH</h3>
+        <p style="font-size: 12px; color: var(--gray);" id="modal-rec-time"></p>
+        <span style="display:inline-block; font-size:11px; padding:2px 8px; border-radius:4px; margin-top:4px; font-weight:700; background:#e8f5e9; color:var(--primary);" id="modal-rec-method">TUNAI</span>
+      </div>
+      
+      <div id="modal-rec-items" style="max-height:160px; overflow-y:auto; margin: 10px 0; font-size: 13px; display:flex; flex-direction:column; gap:5px;"></div>
+      
+      <div style="border-top: 1px dashed var(--border); padding-top: 8px; font-size: 14px; display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px;">
+          <span>Total:</span><span id="modal-rec-total">Rp 0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--gray);">Diterima:</span><span id="modal-rec-cash">Rp 0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--accent);">
+          <span>Kembalian:</span><span id="modal-rec-change">Rp 0</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn-standard" style="width: 100%; padding: 12px;" onclick="closeReceiptModal()">Transaksi Baru / Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
   <nav>
     <button class="nav-btn active" onclick="navigate('kasir')">
       <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
@@ -481,7 +534,6 @@
           const installingWorker = reg.installing;
           installingWorker.onstatechange = () => {
             if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // Ada update baru saat online, reload otomatis
               window.location.reload();
             }
           };
@@ -489,7 +541,6 @@
       }).catch(console.error);
     }
 
-    // Tombol Manual: Hapus Cache & Refresh Halaman
     async function hardClearCache() {
       if (confirm('Perbarui dan bersihkan cache aplikasi? (Data penjualan tetap aman)')) {
         if ('caches' in window) {
@@ -524,16 +575,24 @@
       db = e.target.result;
       getAllFromStore('products').then(items => {
         if (items.length === 0) {
-          const defaultItems = [
-            { name: 'Es Teh Manis', cost: 1500, price: 3000 },
-            { name: 'Es Teh Jumbo', cost: 2000, price: 5000 },
-            { name: 'Es Lemon Tea', cost: 3000, price: 6000 }
-          ];
-          defaultItems.forEach(it => addItemToStore('products', it));
+          seedDefaultProducts();
+        } else {
+          renderPosProducts();
         }
-        renderPosProducts();
       });
     };
+
+    function seedDefaultProducts() {
+      const defaultItems = [
+        { name: 'Teh hangat', cost: 1500, price: 3000 },
+        { name: 'Es jeruk', cost: 2000, price: 4000 },
+        { name: 'Jeruk hangat', cost: 2000, price: 4000 },
+        { name: 'Es teh jumbo', cost: 1500, price: 3000 },
+        { name: 'Good day', cost: 2500, price: 4500 }
+      ];
+      defaultItems.forEach(it => addItemToStore('products', it));
+      setTimeout(renderPosProducts, 200);
+    }
 
     function getTransaction(storeName, mode) {
       return db.transaction(storeName, mode).objectStore(storeName);
@@ -563,7 +622,7 @@
       });
     }
 
-    /* 3. NAVIGASI BIASA (TANPA BLOCK TOMBOL BACK) */
+    /* 3. NAVIGASI BIASA */
     function navigate(sec) {
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -583,7 +642,7 @@
       }
     }
 
-    /* 4. FORMAT ANGKA & NOMINAL */
+    /* 4. FORMAT ANGKA & METODE BAYAR */
     function formatNumber(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
@@ -598,7 +657,6 @@
     }
 
     let paymentMethod = 'cash';
-
     function setPaymentMethod(method) {
       paymentMethod = method;
       document.getElementById('tab-cash').classList.toggle('active', method === 'cash');
@@ -653,6 +711,7 @@
         document.getElementById('prod-name').value = p.name;
         document.getElementById('prod-cost').value = p.cost;
         document.getElementById('prod-price').value = p.price;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
@@ -679,25 +738,33 @@
       `).join('');
     }
 
-    /* 6. KASIR */
+    /* 6. LOGIKA KASIR, FLOATING CART & MODAL CHECKOUT */
     let cart = [];
 
     async function renderPosProducts() {
       const prods = await getAllFromStore('products');
       const container = document.getElementById('pos-products');
-      container.innerHTML = prods.map(p => `
-        <div class="card-product" onclick='addToCart(${JSON.stringify(p)})'>
-          <div class="name">${p.name}</div>
-          <div class="price">Rp ${p.price.toLocaleString('id-ID')}</div>
-        </div>
-      `).join('');
+      
+      container.innerHTML = prods.map(p => {
+        const itemInCart = cart.find(c => c.id === p.id);
+        const qtyBadge = itemInCart ? `<span class="badge-qty">${itemInCart.qty}</span>` : '';
+        return `
+          <div class="card-product" onclick='addToCart(${JSON.stringify(p)})'>
+            ${qtyBadge}
+            <div class="name">${p.name}</div>
+            <div class="price">Rp ${p.price.toLocaleString('id-ID')}</div>
+          </div>
+        `;
+      }).join('');
+
+      updateCartViews();
     }
 
     function addToCart(p) {
       const item = cart.find(i => i.id === p.id);
       if (item) item.qty += 1;
       else cart.push({ ...p, qty: 1 });
-      updateCartView();
+      renderPosProducts();
     }
 
     function changeQty(id, delta) {
@@ -705,21 +772,28 @@
       if (!item) return;
       item.qty += delta;
       if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
-      updateCartView();
+      renderPosProducts();
+      if (cart.length === 0) closePaymentModal();
     }
 
-    function updateCartView() {
-      const container = document.getElementById('cart-list');
-      if (cart.length === 0) {
-        container.innerHTML = '<p style="color:var(--gray); font-size:14px; text-align:center; padding:12px;">Keranjang kosong</p>';
-        document.getElementById('cart-total-display').textContent = 'Rp 0';
-        calcChange();
-        return;
+    function updateCartViews() {
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      const totalCount = cart.reduce((s, i) => s + i.qty, 0);
+
+      // 1. Update Bilah Keranjang Melayang di Halaman Utama
+      const floatingBar = document.getElementById('floating-cart-bar');
+      if (cart.length > 0) {
+        floatingBar.style.display = 'flex';
+        document.getElementById('floating-cart-count').textContent = totalCount + ' Cup';
+        document.getElementById('floating-cart-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+      } else {
+        floatingBar.style.display = 'none';
       }
-      let total = 0;
+
+      // 2. Update Isi Rincian di dalam Modal Pembayaran
+      const container = document.getElementById('cart-list');
       container.innerHTML = cart.map(i => {
         const sub = i.price * i.qty;
-        total += sub;
         return `
           <div class="cart-row">
             <div>
@@ -735,6 +809,7 @@
           </div>
         `;
       }).join('');
+
       document.getElementById('cart-total-display').textContent = 'Rp ' + total.toLocaleString('id-ID');
       calcChange();
     }
@@ -746,6 +821,16 @@
       const el = document.getElementById('cash-change-display');
       el.textContent = cash >= total && total > 0 ? 'Rp ' + formatNumber(change) : 'Rp 0';
       el.style.color = cash >= total && total > 0 ? 'var(--primary)' : 'var(--danger)';
+    }
+
+    function openPaymentModal() {
+      if (cart.length === 0) return;
+      document.getElementById('payment-modal').style.display = 'flex';
+      calcChange();
+    }
+
+    function closePaymentModal() {
+      document.getElementById('payment-modal').style.display = 'none';
     }
 
     async function processCheckout(printReceipt = true) {
@@ -776,6 +861,7 @@
       };
 
       await addItemToStore('sales', sale);
+      closePaymentModal();
 
       if (printReceipt) {
         document.getElementById('rec-datetime').textContent = new Date().toLocaleString('id-ID');
@@ -824,10 +910,10 @@
       cart = [];
       document.getElementById('cash-given').value = '';
       setPaymentMethod('cash');
-      updateCartView();
+      renderPosProducts();
     }
 
-    /* 7. LAPORAN & DIAGRAM */
+    /* 7. LAPORAN & DIAGRAM LINGKARAN */
     async function loadReportData() {
       const type = document.getElementById('report-type').value;
       const allSales = await getAllFromStore('sales');
@@ -928,21 +1014,33 @@
       document.body.className = '';
     }
 
-    /* 8. RESET TRANSAKSI & CADANGKAN DATA */
+    /* 8. FITUR RESET PRODUK, RESET TRANSAKSI & CADANGAN */
+    async function resetProductsData() {
+      if (confirm('PERINGATAN: Apakah Anda ingin menghapus seluruh daftar menu saat ini dan mengembalikannya ke menu standar booth?')) {
+        const tx = db.transaction('products', 'readwrite');
+        tx.objectStore('products').clear();
+        tx.oncomplete = () => {
+          seedDefaultProducts();
+          alert('Menu dagangan berhasil di-reset ke pengaturan awal.');
+          renderProductTable();
+        };
+      }
+    }
+
     async function resetSalesData() {
       const confirm1 = confirm('PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA data transaksi penjualan?');
       if (!confirm1) return;
 
-      const confirm2 = prompt('Ketik "RESET" dengan huruf besar untuk mengonfirmasi penghapusan:');
+      const confirm2 = prompt('Ketik "RESET" dengan huruf besar untuk mengonfirmasi:');
       if (confirm2 === 'RESET') {
         const tx = db.transaction('sales', 'readwrite');
         tx.objectStore('sales').clear();
         tx.oncomplete = () => {
-          alert('Semua data riwayat transaksi berhasil di-reset menjadi nol.');
+          alert('Semua riwayat transaksi berhasil dihapus menjadi nol.');
           loadReportData();
         };
       } else {
-        alert('Konfirmasi dibatalkan. Kata kunci salah.');
+        alert('Konfirmasi dibatalkan.');
       }
     }
 
