@@ -21,6 +21,7 @@
       --border: #cccccc;
       --accent: #e65100;
       --danger: #d32f2f;
+      --blue: #1565c0;
     }
     * {
       box-sizing: border-box;
@@ -37,7 +38,7 @@
       height: 100vh;
       overflow: hidden;
       user-select: none;
-      font-size: 15px; /* Ukuran font dasar diperbesar */
+      font-size: 15px;
     }
 
     /* LOADING SCREEN */
@@ -64,30 +65,24 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* MODAL KONFIRMASI KELUAR */
-    #exit-modal {
+    /* MODAL UMUM */
+    .modal-backdrop {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.55);
       align-items: center;
       justify-content: center;
       z-index: 9998;
-      padding: 20px;
+      padding: 16px;
     }
     .modal-box {
       background: var(--surface);
       border-radius: 12px;
-      padding: 22px;
+      padding: 20px;
       width: 100%;
-      max-width: 320px;
-      text-align: center;
-    }
-    .modal-box h3 { font-size: 18px; margin-bottom: 10px; }
-    .modal-box p { font-size: 14px; color: var(--gray); margin-bottom: 20px; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions button {
-      flex: 1; padding: 12px; border-radius: 8px; border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+      max-width: 330px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
     /* Header */
@@ -111,7 +106,7 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Nav Bawah */
+    /* Navigasi Bawah */
     nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -172,7 +167,7 @@
       flex-direction: column;
       gap: 10px;
     }
-    .cart-items { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .cart-items { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
     .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
     .cart-qty-ctrl { display: flex; align-items: center; gap: 8px; }
     .btn-circle {
@@ -188,7 +183,49 @@
       font-size: 17px; font-weight: 800;
     }
 
-    /* Dua Tombol Aksi Kasir */
+    /* PILIHAN METODE PEMBAYARAN */
+    .pay-method-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .pay-tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fafafa;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pay-tab.active {
+      background: #e8f5e9;
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    /* TOMBOL TEMPLATE PECAHAN UANG */
+    .quick-cash-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .btn-quick-cash {
+      padding: 8px 4px;
+      background: #f1f3f4;
+      border: 1px solid #dcdcdc;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-quick-cash:active { background: #e0e0e0; }
+
+    /* Tombol Aksi Kasir */
     .checkout-actions {
       display: flex;
       gap: 10px;
@@ -214,8 +251,8 @@
 
     /* Form & Elemen Umum */
     .card { background: var(--surface); padding: 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
-    .form-group { margin-bottom: 12px; }
-    label { font-size: 13px; font-weight: 700; color: var(--gray); display: block; margin-bottom: 5px; }
+    .form-group { margin-bottom: 10px; }
+    label { font-size: 13px; font-weight: 700; color: var(--gray); display: block; margin-bottom: 4px; }
     input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
     .btn-standard { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 700; cursor: pointer; }
     .btn-danger { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; }
@@ -225,7 +262,7 @@
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: #f5f5f5; font-weight: 700; }
 
-    /* Struk Kasir 58mm */
+    /* Struk Kasir 58mm Fisik */
     #receipt-area { display: none; }
 
     @media print {
@@ -246,30 +283,62 @@
 </head>
 <body>
 
+  <!-- LOADING OVERLAY -->
   <div id="loading-screen">
     <div class="spinner"></div>
     <div style="font-size: 17px; font-weight: 700;">Memuat Kasir...</div>
     <div style="font-size: 13px; opacity: 0.85; margin-top: 4px;">Menyiapkan database lokal</div>
   </div>
 
-  <div id="exit-modal">
-    <div class="modal-box">
-      <h3>Keluar Aplikasi?</h3>
-      <p>Yakin ingin menutup aplikasi kasir?</p>
-      <div class="modal-actions">
-        <button style="background: #eeeeee; color: #333;" onclick="cancelExit()">Batal</button>
-        <button style="background: var(--danger); color: white;" onclick="confirmExit()">Ya, Keluar</button>
+  <!-- MODAL EXIT -->
+  <div id="exit-modal" class="modal-backdrop">
+    <div class="modal-box" style="text-align: center;">
+      <h3 style="font-size: 18px; margin-bottom: 10px;">Keluar Aplikasi?</h3>
+      <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">Yakin ingin menutup aplikasi kasir?</p>
+      <div style="display: flex; gap: 10px;">
+        <button style="flex:1; padding:12px; border-radius:8px; border:none; background:#eee; font-weight:700;" onclick="cancelExit()">Batal</button>
+        <button style="flex:1; padding:12px; border-radius:8px; border:none; background:var(--danger); color:white; font-weight:700;" onclick="confirmExit()">Ya, Keluar</button>
       </div>
     </div>
   </div>
 
+  <!-- MODAL DIGITAL NOTA (SAAT SIMPAN SAJA) -->
+  <div id="receipt-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 17px;">BOOTH ES TEH</h3>
+        <p style="font-size: 12px; color: var(--gray);" id="modal-rec-time"></p>
+        <span style="display:inline-block; font-size:11px; padding:2px 8px; border-radius:4px; margin-top:4px; font-weight:700; background:#e8f5e9; color:var(--primary);" id="modal-rec-method">TUNAI</span>
+      </div>
+      
+      <div id="modal-rec-items" style="max-height:160px; overflow-y:auto; margin: 10px 0; font-size: 13px; display:flex; flex-direction:column; gap:5px;"></div>
+      
+      <div style="border-top: 1px dashed var(--border); padding-top: 8px; font-size: 14px; display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px;">
+          <span>Total:</span><span id="modal-rec-total">Rp 0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--gray);">Diterima:</span><span id="modal-rec-cash">Rp 0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--accent);">
+          <span>Kembalian:</span><span id="modal-rec-change">Rp 0</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn-standard" style="width: 100%; padding: 12px;" onclick="closeReceiptModal()">Transaksi Baru / Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP HEADER -->
   <header>
     <h1 id="page-title">Booth Es Teh</h1>
     <span style="font-size: 12px; background: rgba(255,255,255,0.25); padding: 4px 8px; border-radius: 8px; font-weight: 600;">100% Offline</span>
   </header>
 
   <main>
-    <!-- 1. KASIR -->
+    <!-- 1. SECTION KASIR -->
     <div id="section-kasir" class="section active">
       <div class="pos-layout">
         <div>
@@ -288,17 +357,40 @@
             <span id="cart-total-display">Rp 0</span>
           </div>
 
-          <div class="form-group" style="margin-top: 4px;">
-            <label>Uang Tunai Diterima (Rp)</label>
-            <input type="number" id="cash-given" placeholder="Contoh: 20000" oninput="calcChange()">
+          <!-- REVISI: Pilihan Pembayaran Tunai & QRIS -->
+          <div style="margin-top: 4px;">
+            <label>Metode Pembayaran</label>
+            <div class="pay-method-selector">
+              <div class="pay-tab active" id="tab-cash" onclick="setPaymentMethod('cash')">Tunai (Cash)</div>
+              <div class="pay-tab" id="tab-qris" onclick="setPaymentMethod('qris')">QRIS / Non-Tunai</div>
+            </div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700;">
-            <span>Uang Kembalian:</span>
-            <span id="cash-change-display">Rp 0</span>
+          <!-- Bagian Input Uang Tunai -->
+          <div id="cash-input-wrapper">
+            <div class="form-group" style="margin-top: 8px;">
+              <label>Uang Tunai Diterima (Rp)</label>
+              <input type="text" inputmode="numeric" id="cash-given" placeholder="0" oninput="handleCashInput(this)">
+            </div>
+
+            <!-- Template Cepat Nominal Uang -->
+            <label style="margin-bottom: 2px;">Pilihan Cepat Nominal:</label>
+            <div class="quick-cash-grid">
+              <button class="btn-quick-cash" onclick="setQuickCash('exact')">Uang Pas</button>
+              <button class="btn-quick-cash" onclick="setQuickCash(5000)">5.000</button>
+              <button class="btn-quick-cash" onclick="setQuickCash(10000)">10.000</button>
+              <button class="btn-quick-cash" onclick="setQuickCash(20000)">20.000</button>
+              <button class="btn-quick-cash" onclick="setQuickCash(50000)">50.000</button>
+              <button class="btn-quick-cash" onclick="setQuickCash(100000)">100.000</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; margin-top:10px;">
+              <span>Uang Kembalian:</span>
+              <span id="cash-change-display">Rp 0</span>
+            </div>
           </div>
 
-          <!-- REVISI 1: Tombol Simpan & Cetak Berdampingan -->
+          <!-- Tombol Aksi Simpan Saja & Simpan Cetak -->
           <div class="checkout-actions">
             <button class="btn-action btn-save-only" onclick="processCheckout(false)">Simpan Saja</button>
             <button class="btn-action btn-save-print" onclick="processCheckout(true)">Simpan & Cetak</button>
@@ -307,7 +399,7 @@
       </div>
     </div>
 
-    <!-- 2. PRODUK -->
+    <!-- 2. SECTION PRODUK -->
     <div id="section-produk" class="section">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Kelola Menu Minuman</h3>
@@ -342,7 +434,7 @@
       </div>
     </div>
 
-    <!-- 3. LAPORAN & DIAGRAM LINGKARAN -->
+    <!-- 3. SECTION LAPORAN -->
     <div id="section-laporan" class="section">
       <div class="card no-print">
         <div style="display: flex; gap: 8px;">
@@ -370,9 +462,8 @@
         <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b></p>
       </div>
 
-      <!-- REVISI 3: Diagram Lingkaran Native -->
       <div class="card">
-        <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Penjualan Minuman Terlaris</h4>
+        <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Penjualan Terlaris</h4>
         <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
           <canvas id="pieChart" width="220" height="220" style="width:220px; height:220px;"></canvas>
           <div id="pie-legend" style="width:100%; display:flex; flex-direction:column; gap:6px; font-size:13px;"></div>
@@ -382,14 +473,14 @@
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Waktu</th><th>Rincian Item</th><th>Total</th></tr>
+            <tr><th>Waktu</th><th>Metode</th><th>Item</th><th>Total</th></tr>
           </thead>
           <tbody id="report-table-body"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- 4. BACKUP DATA -->
+    <!-- 4. SECTION SETTING & BACKUP -->
     <div id="section-setting" class="section">
       <div class="card">
         <h3 style="font-size: 16px; margin-bottom: 8px;">Cadangkan & Pulihkan</h3>
@@ -424,11 +515,12 @@
     </button>
   </nav>
 
-  <!-- Format Struk 58mm -->
+  <!-- STRUK PRINTER BLUETOOTH 58MM -->
   <div id="receipt-area">
     <div style="text-align: center; margin-bottom: 4px;">
       <h2 style="font-size: 14px; margin: 0;">BOOTH ES TEH</h2>
       <p style="font-size: 11px; margin: 0;" id="rec-datetime"></p>
+      <p style="font-size: 10px; margin: 0;" id="rec-paytype"></p>
     </div>
     <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
     <div id="rec-items"></div>
@@ -445,9 +537,9 @@
       navigator.serviceWorker.register('./sw.js').catch(console.error);
     }
 
-    /* DATABASE NATIVE INDEXEDDB */
+    /* INDEXEDDB NATIVE */
     let db;
-    const request = indexedDB.open('OfflineBoothPOS', 1);
+    const request = indexedDB.open('OfflineBoothPOS', 2);
 
     request.onupgradeneeded = (e) => {
       db = e.target.result;
@@ -507,7 +599,7 @@
       });
     }
 
-    /* HANDLE BACK BUTTON ANDROID & EXIT POPUP */
+    /* BACK SWIPE & EXIT POPUP */
     let currentSection = 'kasir';
     let isExiting = false;
 
@@ -562,6 +654,44 @@
       document.getElementById('exit-modal').style.display = 'none';
       history.go(-2);
       setTimeout(() => window.close(), 200);
+    }
+
+    /* FORMAT NOMINAL RIBUAN */
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    function unformatNumber(str) {
+      return parseInt(str.toString().replace(/\./g, '')) || 0;
+    }
+
+    function handleCashInput(input) {
+      const raw = unformatNumber(input.value);
+      input.value = raw > 0 ? formatNumber(raw) : '';
+      calcChange();
+    }
+
+    /* METODE PEMBAYARAN */
+    let paymentMethod = 'cash'; // 'cash' atau 'qris'
+
+    function setPaymentMethod(method) {
+      paymentMethod = method;
+      document.getElementById('tab-cash').classList.toggle('active', method === 'cash');
+      document.getElementById('tab-qris').classList.toggle('active', method === 'qris');
+      
+      const cashWrapper = document.getElementById('cash-input-wrapper');
+      if (method === 'qris') {
+        cashWrapper.style.display = 'none';
+      } else {
+        cashWrapper.style.display = 'block';
+        calcChange();
+      }
+    }
+
+    function setQuickCash(val) {
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      let target = val === 'exact' ? total : val;
+      document.getElementById('cash-given').value = target > 0 ? formatNumber(target) : '';
+      calcChange();
     }
 
     /* CRUD PRODUK */
@@ -623,7 +753,7 @@
       `).join('');
     }
 
-    /* KASIR & DUA PILIHAN CHECKOUT */
+    /* KASIR & KERANJANG */
     let cart = [];
 
     async function renderPosProducts() {
@@ -685,35 +815,48 @@
 
     function calcChange() {
       const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-      const cash = parseInt(document.getElementById('cash-given').value) || 0;
+      const cash = unformatNumber(document.getElementById('cash-given').value);
       const change = cash - total;
       const el = document.getElementById('cash-change-display');
-      el.textContent = cash >= total && total > 0 ? 'Rp ' + change.toLocaleString('id-ID') : 'Rp 0';
+      el.textContent = cash >= total && total > 0 ? 'Rp ' + formatNumber(change) : 'Rp 0';
       el.style.color = cash >= total && total > 0 ? 'var(--primary)' : 'var(--danger)';
     }
 
-    // Fungsi Checkout dengan parameter cetakNota (true/false)
+    /* CHECKOUT: SIMPAN SAJA (MODAL DIGITAL NOTA) & SIMPAN CETAK */
     async function processCheckout(printReceipt = true) {
       if (cart.length === 0) return alert('Keranjang masih kosong!');
       const totalOmset = cart.reduce((s, i) => s + (i.price * i.qty), 0);
       const totalCost = cart.reduce((s, i) => s + (i.cost * i.qty), 0);
-      const cashGiven = parseInt(document.getElementById('cash-given').value) || 0;
+      
+      let cashGiven = 0;
+      let cashChange = 0;
 
-      if (cashGiven < totalOmset) return alert('Uang pembayaran masih kurang!');
+      if (paymentMethod === 'cash') {
+        cashGiven = unformatNumber(document.getElementById('cash-given').value);
+        if (cashGiven < totalOmset) return alert('Uang pembayaran masih kurang!');
+        cashChange = cashGiven - totalOmset;
+      } else {
+        // QRIS: Uang pas
+        cashGiven = totalOmset;
+        cashChange = 0;
+      }
 
       const sale = {
         timestamp: new Date().toISOString(),
+        paymentMethod: paymentMethod.toUpperCase(),
         items: [...cart],
         totalOmset,
         totalProfit: totalOmset - totalCost,
         cashGiven,
-        cashChange: cashGiven - totalOmset
+        cashChange
       };
 
       await addItemToStore('sales', sale);
 
       if (printReceipt) {
+        // Cetak struk printer Bluetooth 58mm
         document.getElementById('rec-datetime').textContent = new Date().toLocaleString('id-ID');
+        document.getElementById('rec-paytype').textContent = `[${sale.paymentMethod}]`;
         document.getElementById('rec-items').innerHTML = sale.items.map(i => `
           <div style="display:flex; justify-content:space-between;">
             <span>${i.name} x${i.qty}</span>
@@ -727,16 +870,42 @@
         document.body.className = 'printing-receipt';
         window.print();
         document.body.className = '';
+        resetPOS();
       } else {
-        alert('Transaksi berhasil disimpan tanpa cetak nota!');
+        // REVISI: Tampilkan Modal Nota Digital di Layar HP
+        showReceiptModal(sale);
       }
+    }
 
+    function showReceiptModal(sale) {
+      document.getElementById('modal-rec-time').textContent = new Date().toLocaleString('id-ID');
+      document.getElementById('modal-rec-method').textContent = sale.paymentMethod;
+      document.getElementById('modal-rec-items').innerHTML = sale.items.map(i => `
+        <div style="display:flex; justify-content:space-between;">
+          <span>${i.name} <b>x${i.qty}</b></span>
+          <span>Rp ${(i.price * i.qty).toLocaleString('id-ID')}</span>
+        </div>
+      `).join('');
+      document.getElementById('modal-rec-total').textContent = 'Rp ' + sale.totalOmset.toLocaleString('id-ID');
+      document.getElementById('modal-rec-cash').textContent = 'Rp ' + sale.cashGiven.toLocaleString('id-ID');
+      document.getElementById('modal-rec-change').textContent = 'Rp ' + sale.cashChange.toLocaleString('id-ID');
+
+      document.getElementById('receipt-modal').style.display = 'flex';
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').style.display = 'none';
+      resetPOS();
+    }
+
+    function resetPOS() {
       cart = [];
       document.getElementById('cash-given').value = '';
+      setPaymentMethod('cash');
       updateCartView();
     }
 
-    /* LAPORAN & DIAGRAM LINGKARAN (DONUT CHART NATIVE) */
+    /* LAPORAN & DIAGRAM */
     async function loadReportData() {
       const type = document.getElementById('report-type').value;
       const allSales = await getAllFromStore('sales');
@@ -766,6 +935,7 @@
         tbody.innerHTML += `
           <tr>
             <td>${new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</td>
+            <td><span style="font-size:11px; padding:2px 4px; border-radius:4px; font-weight:700; background:#eee;">${s.paymentMethod || 'TUNAI'}</span></td>
             <td>${desc}</td>
             <td><b>Rp ${s.totalOmset.toLocaleString('id-ID')}</b></td>
           </tr>
@@ -808,7 +978,6 @@
         const sliceAngle = (values[idx] / total) * 2 * Math.PI;
         const color = colors[idx % colors.length];
 
-        // Potongan Donut
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
         ctx.arc(centerX, centerY, 40, startAngle + sliceAngle, startAngle, true);
@@ -818,7 +987,6 @@
 
         startAngle += sliceAngle;
 
-        // Keterangan Warna & Persentase di Bawah
         const percent = Math.round((values[idx] / total) * 100);
         legendBox.innerHTML += `
           <div style="display:flex; justify-content:space-between; align-items:center;">
