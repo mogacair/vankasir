@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kasir-esteh-v4';
+const CACHE_NAME = 'kasir-esteh-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -6,7 +6,6 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  // Langsung aktif tanpa menunggu tab ditutup
   self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
@@ -14,7 +13,6 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  // Hapus semua cache versi lama
   e.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
@@ -25,7 +23,6 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Stale-While-Revalidate: Berikan cache instan, tapi diam-diam cek versi baru di background
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
