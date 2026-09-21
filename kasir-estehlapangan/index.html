@@ -41,30 +41,6 @@
       font-size: 15px;
     }
 
-    /* LOADING SCREEN */
-    #loading-screen {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--primary);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      z-index: 9999;
-      transition: opacity 0.4s ease-out, visibility 0.4s;
-    }
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 5px solid rgba(255,255,255,0.3);
-      border-top-color: #ffffff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     /* MODAL UMUM */
     .modal-backdrop {
       display: none;
@@ -89,14 +65,29 @@
     header {
       background: var(--primary);
       color: white;
-      padding: 14px 16px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
     }
-    header h1 { font-size: 19px; font-weight: 700; }
+    header h1 { font-size: 18px; font-weight: 700; }
     
+    .btn-refresh-cache {
+      background: rgba(255,255,255,0.25);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .btn-refresh-cache:active { background: rgba(255,255,255,0.4); }
+
     main {
       flex: 1;
       overflow-y: auto;
@@ -106,7 +97,7 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Navigasi Bawah */
+    /* Nav Bawah */
     nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -183,96 +174,55 @@
       font-size: 17px; font-weight: 800;
     }
 
-    /* PILIHAN METODE PEMBAYARAN */
-    .pay-method-selector {
-      display: flex;
-      gap: 8px;
-      margin-top: 2px;
-    }
+    /* Pembayaran Tunai & QRIS */
+    .pay-method-selector { display: flex; gap: 8px; margin-top: 2px; }
     .pay-tab {
-      flex: 1;
-      padding: 9px;
-      text-align: center;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #fafafa;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
+      flex: 1; padding: 9px; text-align: center; border-radius: 8px;
+      border: 1px solid var(--border); background: #fafafa;
+      font-size: 13px; font-weight: 700; cursor: pointer;
     }
-    .pay-tab.active {
-      background: #e8f5e9;
-      border-color: var(--primary);
-      color: var(--primary-dark);
-    }
+    .pay-tab.active { background: #e8f5e9; border-color: var(--primary); color: var(--primary-dark); }
 
-    /* TOMBOL TEMPLATE PECAHAN UANG */
-    .quick-cash-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-top: 6px;
-    }
+    /* Template Pecahan */
+    .quick-cash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
     .btn-quick-cash {
-      padding: 8px 4px;
-      background: #f1f3f4;
-      border: 1px solid #dcdcdc;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
+      padding: 8px 4px; background: #f1f3f4; border: 1px solid #dcdcdc;
+      border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
     }
     .btn-quick-cash:active { background: #e0e0e0; }
 
-    /* Tombol Aksi Kasir */
-    .checkout-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
+    /* Tombol Kasir */
+    .checkout-actions { display: flex; gap: 10px; margin-top: 6px; }
     .btn-action {
-      flex: 1;
-      padding: 13px 8px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      flex: 1; padding: 13px 8px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 700; cursor: pointer; text-align: center;
     }
     .btn-save-only { background: #f57c00; color: white; }
     .btn-save-only:active { background: #e65100; }
     .btn-save-print { background: var(--primary); color: white; }
     .btn-save-print:active { background: var(--primary-dark); }
 
-    /* Form & Elemen Umum */
+    /* Elemen Umum */
     .card { background: var(--surface); padding: 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
     .form-group { margin-bottom: 10px; }
     label { font-size: 13px; font-weight: 700; color: var(--gray); display: block; margin-bottom: 4px; }
     input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
     .btn-standard { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .btn-danger { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+    .btn-danger { background: var(--danger); color: white; border: none; padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
     .table-container { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow-x: auto; margin-top: 10px; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: #f5f5f5; font-weight: 700; }
 
-    /* Struk Kasir 58mm Fisik */
     #receipt-area { display: none; }
 
     @media print {
       body * { visibility: hidden; }
       body.printing-receipt #receipt-area, body.printing-receipt #receipt-area * { visibility: visible; }
       body.printing-receipt #receipt-area {
-        display: block !important;
-        position: absolute; left: 0; top: 0;
-        width: 58mm; padding: 2mm;
-        font-family: monospace; color: #000;
+        display: block !important; position: absolute; left: 0; top: 0;
+        width: 58mm; padding: 2mm; font-family: monospace; color: #000;
         font-size: 11px; line-height: 1.2;
       }
       body.printing-report #section-laporan, body.printing-report #section-laporan * { visibility: visible; }
@@ -282,25 +232,6 @@
   </style>
 </head>
 <body>
-
-  <!-- LOADING OVERLAY -->
-  <div id="loading-screen">
-    <div class="spinner"></div>
-    <div style="font-size: 17px; font-weight: 700;">Memuat Kasir...</div>
-    <div style="font-size: 13px; opacity: 0.85; margin-top: 4px;">Menyiapkan database lokal</div>
-  </div>
-
-  <!-- MODAL EXIT -->
-  <div id="exit-modal" class="modal-backdrop">
-    <div class="modal-box" style="text-align: center;">
-      <h3 style="font-size: 18px; margin-bottom: 10px;">Keluar Aplikasi?</h3>
-      <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">Yakin ingin menutup aplikasi kasir?</p>
-      <div style="display: flex; gap: 10px;">
-        <button style="flex:1; padding:12px; border-radius:8px; border:none; background:#eee; font-weight:700;" onclick="cancelExit()">Batal</button>
-        <button style="flex:1; padding:12px; border-radius:8px; border:none; background:var(--danger); color:white; font-weight:700;" onclick="confirmExit()">Ya, Keluar</button>
-      </div>
-    </div>
-  </div>
 
   <!-- MODAL DIGITAL NOTA (SAAT SIMPAN SAJA) -->
   <div id="receipt-modal" class="modal-backdrop">
@@ -331,14 +262,17 @@
     </div>
   </div>
 
-  <!-- TOP HEADER -->
+  <!-- HEADER DENGAN TOMBOL CLEAR CACHE -->
   <header>
     <h1 id="page-title">Booth Es Teh</h1>
-    <span style="font-size: 12px; background: rgba(255,255,255,0.25); padding: 4px 8px; border-radius: 8px; font-weight: 600;">100% Offline</span>
+    <button class="btn-refresh-cache" onclick="hardClearCache()">
+      <svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:currentColor;"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      Refresh Update
+    </button>
   </header>
 
   <main>
-    <!-- 1. SECTION KASIR -->
+    <!-- 1. KASIR -->
     <div id="section-kasir" class="section active">
       <div class="pos-layout">
         <div>
@@ -357,7 +291,7 @@
             <span id="cart-total-display">Rp 0</span>
           </div>
 
-          <!-- REVISI: Pilihan Pembayaran Tunai & QRIS -->
+          <!-- Pilihan Pembayaran Tunai & QRIS -->
           <div style="margin-top: 4px;">
             <label>Metode Pembayaran</label>
             <div class="pay-method-selector">
@@ -366,14 +300,13 @@
             </div>
           </div>
 
-          <!-- Bagian Input Uang Tunai -->
+          <!-- Input Uang Tunai -->
           <div id="cash-input-wrapper">
             <div class="form-group" style="margin-top: 8px;">
               <label>Uang Tunai Diterima (Rp)</label>
               <input type="text" inputmode="numeric" id="cash-given" placeholder="0" oninput="handleCashInput(this)">
             </div>
 
-            <!-- Template Cepat Nominal Uang -->
             <label style="margin-bottom: 2px;">Pilihan Cepat Nominal:</label>
             <div class="quick-cash-grid">
               <button class="btn-quick-cash" onclick="setQuickCash('exact')">Uang Pas</button>
@@ -390,7 +323,6 @@
             </div>
           </div>
 
-          <!-- Tombol Aksi Simpan Saja & Simpan Cetak -->
           <div class="checkout-actions">
             <button class="btn-action btn-save-only" onclick="processCheckout(false)">Simpan Saja</button>
             <button class="btn-action btn-save-print" onclick="processCheckout(true)">Simpan & Cetak</button>
@@ -399,7 +331,7 @@
       </div>
     </div>
 
-    <!-- 2. SECTION PRODUK -->
+    <!-- 2. PRODUK -->
     <div id="section-produk" class="section">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Kelola Menu Minuman</h3>
@@ -434,7 +366,7 @@
       </div>
     </div>
 
-    <!-- 3. SECTION LAPORAN -->
+    <!-- 3. LAPORAN -->
     <div id="section-laporan" class="section">
       <div class="card no-print">
         <div style="display: flex; gap: 8px;">
@@ -480,11 +412,11 @@
       </div>
     </div>
 
-    <!-- 4. SECTION SETTING & BACKUP -->
+    <!-- 4. DATA & SETTING -->
     <div id="section-setting" class="section">
       <div class="card">
         <h3 style="font-size: 16px; margin-bottom: 8px;">Cadangkan & Pulihkan</h3>
-        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">Simpan file cadangan secara berkala agar catatan booth tetap aman.</p>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">Simpan file cadangan secara berkala agar catatan keuangan tetap aman.</p>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn-standard" style="background:#388e3c;" onclick="exportDataBackup()">Download File Cadangan (.json)</button>
           <hr style="border:0; border-top:1px solid var(--border);">
@@ -492,6 +424,15 @@
           <input type="file" id="import-file" accept=".json">
           <button class="btn-standard" style="background:#f57c00;" onclick="importDataBackup()">Pulihkan Sekarang</button>
         </div>
+      </div>
+
+      <!-- RESET DATA TRANSAKSI -->
+      <div class="card" style="border: 1px solid #ef9a9a; background: #fffbfb;">
+        <h3 style="font-size: 16px; margin-bottom: 6px; color: var(--danger);">Reset Data Transaksi</h3>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">
+          Menghapus semua riwayat omset dan laporan keuangan (misal: saat tutup buku/bulan baru). <b>Daftar menu produk tidak akan terhapus.</b>
+        </p>
+        <button class="btn-danger" onclick="resetSalesData()">Hapus Semua Transaksi</button>
       </div>
     </div>
   </main>
@@ -533,11 +474,39 @@
   </div>
 
   <script>
+    /* 1. SERVICE WORKER DENGAN DETEKSI OTOMATIS PEMBARUAN */
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(console.error);
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Ada update baru saat online, reload otomatis
+              window.location.reload();
+            }
+          };
+        };
+      }).catch(console.error);
     }
 
-    /* INDEXEDDB NATIVE */
+    // Tombol Manual: Hapus Cache & Refresh Halaman
+    async function hardClearCache() {
+      if (confirm('Perbarui dan bersihkan cache aplikasi? (Data penjualan tetap aman)')) {
+        if ('caches' in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let reg of registrations) {
+            await reg.unregister();
+          }
+        }
+        window.location.reload(true);
+      }
+    }
+
+    /* 2. INDEXEDDB */
     let db;
     const request = indexedDB.open('OfflineBoothPOS', 2);
 
@@ -563,11 +532,6 @@
           defaultItems.forEach(it => addItemToStore('products', it));
         }
         renderPosProducts();
-        setTimeout(() => {
-          const loader = document.getElementById('loading-screen');
-          loader.style.opacity = '0';
-          setTimeout(() => loader.style.display = 'none', 400);
-        }, 400);
       });
     };
 
@@ -599,29 +563,19 @@
       });
     }
 
-    /* BACK SWIPE & EXIT POPUP */
-    let currentSection = 'kasir';
-    let isExiting = false;
-
-    function pushAppAnchor() {
-      history.pushState({ appRoot: true, section: currentSection }, '', '#' + currentSection);
-    }
-
-    function navigate(sec, push = true) {
+    /* 3. NAVIGASI BIASA (TANPA BLOCK TOMBOL BACK) */
+    function navigate(sec) {
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
 
       const target = document.getElementById('section-' + sec);
       if (target) {
         target.classList.add('active');
-        currentSection = sec;
         const titles = { kasir: 'Booth Es Teh', produk: 'Kelola Menu', laporan: 'Laporan Penjualan', setting: 'Cadangan & Data' };
         document.getElementById('page-title').textContent = titles[sec] || 'Kasir';
 
         const idx = ['kasir', 'produk', 'laporan', 'setting'].indexOf(sec);
         if (idx !== -1) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
-
-        if (push) history.pushState({ section: sec }, '', '#' + sec);
 
         if (sec === 'kasir') renderPosProducts();
         if (sec === 'produk') renderProductTable();
@@ -629,34 +583,7 @@
       }
     }
 
-    window.addEventListener('popstate', (e) => {
-      if (isExiting) return;
-      if (currentSection !== 'kasir') {
-        navigate('kasir', false);
-        pushAppAnchor();
-      } else {
-        showExitModal();
-      }
-    });
-
-    history.replaceState({ root: true }, '', '#kasir');
-    pushAppAnchor();
-
-    function showExitModal() {
-      document.getElementById('exit-modal').style.display = 'flex';
-      pushAppAnchor();
-    }
-    function cancelExit() {
-      document.getElementById('exit-modal').style.display = 'none';
-    }
-    function confirmExit() {
-      isExiting = true;
-      document.getElementById('exit-modal').style.display = 'none';
-      history.go(-2);
-      setTimeout(() => window.close(), 200);
-    }
-
-    /* FORMAT NOMINAL RIBUAN */
+    /* 4. FORMAT ANGKA & NOMINAL */
     function formatNumber(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
@@ -670,8 +597,7 @@
       calcChange();
     }
 
-    /* METODE PEMBAYARAN */
-    let paymentMethod = 'cash'; // 'cash' atau 'qris'
+    let paymentMethod = 'cash';
 
     function setPaymentMethod(method) {
       paymentMethod = method;
@@ -694,7 +620,7 @@
       calcChange();
     }
 
-    /* CRUD PRODUK */
+    /* 5. CRUD PRODUK */
     async function saveProduct() {
       const id = document.getElementById('prod-id').value;
       const name = document.getElementById('prod-name').value.trim();
@@ -753,7 +679,7 @@
       `).join('');
     }
 
-    /* KASIR & KERANJANG */
+    /* 6. KASIR */
     let cart = [];
 
     async function renderPosProducts() {
@@ -822,7 +748,6 @@
       el.style.color = cash >= total && total > 0 ? 'var(--primary)' : 'var(--danger)';
     }
 
-    /* CHECKOUT: SIMPAN SAJA (MODAL DIGITAL NOTA) & SIMPAN CETAK */
     async function processCheckout(printReceipt = true) {
       if (cart.length === 0) return alert('Keranjang masih kosong!');
       const totalOmset = cart.reduce((s, i) => s + (i.price * i.qty), 0);
@@ -836,7 +761,6 @@
         if (cashGiven < totalOmset) return alert('Uang pembayaran masih kurang!');
         cashChange = cashGiven - totalOmset;
       } else {
-        // QRIS: Uang pas
         cashGiven = totalOmset;
         cashChange = 0;
       }
@@ -854,7 +778,6 @@
       await addItemToStore('sales', sale);
 
       if (printReceipt) {
-        // Cetak struk printer Bluetooth 58mm
         document.getElementById('rec-datetime').textContent = new Date().toLocaleString('id-ID');
         document.getElementById('rec-paytype').textContent = `[${sale.paymentMethod}]`;
         document.getElementById('rec-items').innerHTML = sale.items.map(i => `
@@ -872,7 +795,6 @@
         document.body.className = '';
         resetPOS();
       } else {
-        // REVISI: Tampilkan Modal Nota Digital di Layar HP
         showReceiptModal(sale);
       }
     }
@@ -905,7 +827,7 @@
       updateCartView();
     }
 
-    /* LAPORAN & DIAGRAM */
+    /* 7. LAPORAN & DIAGRAM */
     async function loadReportData() {
       const type = document.getElementById('report-type').value;
       const allSales = await getAllFromStore('sales');
@@ -1006,7 +928,24 @@
       document.body.className = '';
     }
 
-    /* BACKUP & RESTORE DATA */
+    /* 8. RESET TRANSAKSI & CADANGKAN DATA */
+    async function resetSalesData() {
+      const confirm1 = confirm('PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA data transaksi penjualan?');
+      if (!confirm1) return;
+
+      const confirm2 = prompt('Ketik "RESET" dengan huruf besar untuk mengonfirmasi penghapusan:');
+      if (confirm2 === 'RESET') {
+        const tx = db.transaction('sales', 'readwrite');
+        tx.objectStore('sales').clear();
+        tx.oncomplete = () => {
+          alert('Semua data riwayat transaksi berhasil di-reset menjadi nol.');
+          loadReportData();
+        };
+      } else {
+        alert('Konfirmasi dibatalkan. Kata kunci salah.');
+      }
+    }
+
     async function exportDataBackup() {
       const products = await getAllFromStore('products');
       const sales = await getAllFromStore('sales');
