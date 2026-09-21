@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kasir-esteh-v3';
+const CACHE_NAME = 'kasir-esteh-v4';
 const ASSETS = [
   './',
   './index.html',
