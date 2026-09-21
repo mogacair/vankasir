@@ -66,7 +66,6 @@
     }
     .btn-refresh-cache:active { background: rgba(255,255,255,0.4); }
 
-    /* MAIN CONTAINER DENGAN BOTTOM PADDING AMAN */
     main {
       flex: 1;
       overflow-y: auto;
@@ -76,7 +75,7 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* GRID MENU PRODUK */
+    /* KATALOG PRODUK */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
@@ -134,7 +133,7 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* MODAL BOTTOM SHEET PEMBAYARAN */
+    /* MODAL BOTTOM SHEET */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -160,7 +159,6 @@
       to { transform: translateY(0); }
     }
 
-    /* MODAL DIALOG KARTU NOTA */
     .modal-dialog {
       background: var(--surface);
       border-radius: 14px;
@@ -170,7 +168,6 @@
       margin: auto;
     }
 
-    /* RINCIAN PESANAN DI MODAL */
     .cart-items { max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
     .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
     .cart-qty-ctrl { display: flex; align-items: center; gap: 8px; }
@@ -203,7 +200,7 @@
     .btn-save-only { background: #f57c00; color: white; }
     .btn-save-print { background: var(--primary); color: white; }
 
-    /* NAVIGASI BAWAH */
+    /* NAV BAWAH */
     nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -243,7 +240,22 @@
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: #f5f5f5; font-weight: 700; }
 
-    /* CETAK NOTA 58MM */
+    /* HEADER KELOMPOK TANGGAL DI TABEL */
+    tr.group-header td {
+      background: #e8f5e9;
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 10px;
+    }
+    tr.group-footer td {
+      background: #fafafa;
+      font-weight: 700;
+      font-size: 13px;
+      border-bottom: 2px solid #ccc;
+    }
+
+    /* STRUK PRINT 58MM & LAPORAN PDF */
     #receipt-area { display: none; }
     @media print {
       body * { visibility: hidden; }
@@ -271,13 +283,13 @@
   </header>
 
   <main>
-    <!-- 1. KASIR (KATALOG SAJA) -->
+    <!-- 1. KASIR -->
     <div id="section-kasir" class="section active">
       <h3 style="font-size: 15px; margin-bottom: 10px; color: var(--gray);">Sentuh Menu untuk Menambahkan:</h3>
       <div class="product-grid" id="pos-products"></div>
     </div>
 
-    <!-- 2. KELOLA MENU -->
+    <!-- 2. KELOLA MENU (TANPA INPUT HPP) -->
     <div id="section-produk" class="section">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Tambah / Edit Menu</h3>
@@ -286,15 +298,9 @@
           <label>Nama Menu Minuman</label>
           <input type="text" id="prod-name" placeholder="Misal: Es Teh Jumbo">
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div class="form-group">
-            <label>Modal (HPP)</label>
-            <input type="number" id="prod-cost" placeholder="0">
-          </div>
-          <div class="form-group">
-            <label>Harga Jual</label>
-            <input type="number" id="prod-price" placeholder="0">
-          </div>
+        <div class="form-group">
+          <label>Harga Jual (Rp)</label>
+          <input type="number" id="prod-price" placeholder="Contoh: 3000">
         </div>
         <div style="display: flex; gap: 8px; margin-top: 4px;">
           <button class="btn-standard" onclick="saveProduct()">Simpan Menu</button>
@@ -305,14 +311,14 @@
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Menu</th><th>HPP</th><th>Harga</th><th>Aksi</th></tr>
+            <tr><th>Nama Menu</th><th>Harga Jual</th><th>Aksi</th></tr>
           </thead>
           <tbody id="product-table-body"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- 3. LAPORAN PENJUALAN -->
+    <!-- 3. LAPORAN PENJUALAN (DIKELOMPOKKAN PER TANGGAL, TANPA OMSET/LABA) -->
     <div id="section-laporan" class="section">
       <div class="card no-print">
         <div style="display: flex; gap: 8px;">
@@ -325,44 +331,36 @@
         </div>
       </div>
 
-      <div class="card">
-        <h3 style="font-size: 16px; margin-bottom: 10px;" id="report-title-display">Laporan Penjualan</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
-          <div style="background:#e8f5e9; padding:10px; border-radius:8px;">
-            <div style="font-size:12px; color:var(--gray);">Total Omset</div>
-            <div style="font-size:17px; font-weight:800; color:var(--primary);" id="rep-omset">Rp 0</div>
-          </div>
-          <div style="background:#e3f2fd; padding:10px; border-radius:8px;">
-            <div style="font-size:12px; color:var(--gray);">Laba Bersih</div>
-            <div style="font-size:17px; font-weight:800; color:#1976d2;" id="rep-profit">Rp 0</div>
-          </div>
-        </div>
-        <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b></p>
+      <div class="card" style="padding-bottom: 6px;">
+        <h3 style="font-size: 16px; margin-bottom: 4px;" id="report-title-display">Laporan Penjualan</h3>
+        <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b> Transaksi</p>
       </div>
 
+      <!-- Diagram Minuman Paling Laris -->
       <div class="card">
-        <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Penjualan Terlaris</h4>
+        <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Minuman Terlaris</h4>
         <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
           <canvas id="pieChart" width="220" height="220" style="width:220px; height:220px;"></canvas>
           <div id="pie-legend" style="width:100%; display:flex; flex-direction:column; gap:6px; font-size:13px;"></div>
         </div>
       </div>
 
+      <!-- Tabel Pengelompokan Berdasarkan Tanggal -->
       <div class="table-container">
         <table>
           <thead>
-            <tr><th>Waktu</th><th>Metode</th><th>Item</th><th>Total</th></tr>
+            <tr><th>Jam</th><th>Metode</th><th>Item</th><th>Total</th></tr>
           </thead>
           <tbody id="report-table-body"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- 4. DATA, CADANGAN & TOMBOL RESET BERSIH -->
+    <!-- 4. DATA & SETTING -->
     <div id="section-setting" class="section">
       <div class="card">
         <h3 style="font-size: 16px; margin-bottom: 8px;">Cadangkan & Pulihkan</h3>
-        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">Simpan file cadangan secara berkala agar catatan keuangan tetap aman.</p>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">Simpan file cadangan secara berkala agar catatan booth tetap aman.</p>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn-standard" style="background:#388e3c;" onclick="exportDataBackup()">Download File Cadangan (.json)</button>
           <hr style="border:0; border-top:1px solid var(--border);">
@@ -372,7 +370,6 @@
         </div>
       </div>
 
-      <!-- RESET MENU PRODUK BERSIH -->
       <div class="card" style="border: 1px solid #ffe082; background: #fffdf6;">
         <h3 style="font-size: 16px; margin-bottom: 6px; color: #f57f17;">Reset Data Barang Dagangan</h3>
         <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">
@@ -381,11 +378,10 @@
         <button class="btn-standard" style="background:#fbc02d; color:#000;" onclick="resetProductsData()">Hapus Bersih Semua Menu</button>
       </div>
 
-      <!-- RESET TRANSAKSI -->
       <div class="card" style="border: 1px solid #ef9a9a; background: #fffbfb;">
         <h3 style="font-size: 16px; margin-bottom: 6px; color: var(--danger);">Reset Data Transaksi</h3>
         <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">
-          Menghapus semua riwayat omset dan laporan transaksi (tutup buku). <b>Daftar menu minuman tidak akan terhapus.</b>
+          Menghapus semua riwayat transaksi penjualan (tutup buku). <b>Daftar menu minuman tidak akan terhapus.</b>
         </p>
         <button class="btn-danger" onclick="resetSalesData()">Hapus Semua Transaksi</button>
       </div>
@@ -485,7 +481,7 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- NAV BAWAH -->
   <nav>
     <button class="nav-btn active" onclick="navigate('kasir')">
       <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
@@ -553,7 +549,7 @@
       }
     }
 
-    /* 2. INDEXEDDB (MURNI TANPA AUTO-SEED MENU) */
+    /* 2. INDEXEDDB */
     let db;
     const request = indexedDB.open('OfflineBoothPOS', 2);
 
@@ -600,7 +596,7 @@
       });
     }
 
-    /* 3. NAVIGASI BIASA */
+    /* 3. NAVIGASI */
     function navigate(sec) {
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -656,19 +652,18 @@
       calcChange();
     }
 
-    /* 5. CRUD PRODUK */
+    /* 5. CRUD PRODUK (MURNI NAMA & HARGA JUAL) */
     async function saveProduct() {
       const id = document.getElementById('prod-id').value;
       const name = document.getElementById('prod-name').value.trim();
-      const cost = parseInt(document.getElementById('prod-cost').value) || 0;
       const price = parseInt(document.getElementById('prod-price').value) || 0;
 
       if (!name || price <= 0) return alert('Nama menu dan harga jual wajib diisi!');
 
       if (id) {
-        await updateItemInStore('products', { id: parseInt(id), name, cost, price });
+        await updateItemInStore('products', { id: parseInt(id), name, price });
       } else {
-        await addItemToStore('products', { name, cost, price });
+        await addItemToStore('products', { name, price });
       }
       resetProductForm();
       renderProductTable();
@@ -677,7 +672,6 @@
     function resetProductForm() {
       document.getElementById('prod-id').value = '';
       document.getElementById('prod-name').value = '';
-      document.getElementById('prod-cost').value = '';
       document.getElementById('prod-price').value = '';
     }
 
@@ -687,7 +681,6 @@
       if (p) {
         document.getElementById('prod-id').value = p.id;
         document.getElementById('prod-name').value = p.name;
-        document.getElementById('prod-cost').value = p.cost;
         document.getElementById('prod-price').value = p.price;
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -705,13 +698,12 @@
       const tbody = document.getElementById('product-table-body');
       tbody.innerHTML = '';
       if (prods.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--gray); padding:20px;">Belum ada menu terdaftar. Silakan tambahkan menu di atas.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--gray); padding:20px;">Belum ada menu terdaftar. Silakan tambahkan menu di atas.</td></tr>';
         return;
       }
       tbody.innerHTML = prods.map(p => `
         <tr>
           <td><b>${p.name}</b></td>
-          <td>Rp ${p.cost.toLocaleString('id-ID')}</td>
           <td>Rp ${p.price.toLocaleString('id-ID')}</td>
           <td>
             <button class="btn-standard" style="padding:4px 8px; font-size:12px;" onclick="editProduct(${p.id})">Edit</button>
@@ -823,7 +815,6 @@
     async function processCheckout(printReceipt = true) {
       if (cart.length === 0) return alert('Keranjang masih kosong!');
       const totalOmset = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-      const totalCost = cart.reduce((s, i) => s + (i.cost * i.qty), 0);
       
       let cashGiven = 0;
       let cashChange = 0;
@@ -842,7 +833,6 @@
         paymentMethod: paymentMethod.toUpperCase(),
         items: [...cart],
         totalOmset,
-        totalProfit: totalOmset - totalCost,
         cashGiven,
         cashChange
       };
@@ -900,7 +890,7 @@
       renderPosProducts();
     }
 
-    /* 7. LAPORAN & DIAGRAM LINGKARAN */
+    /* 7. LAPORAN PENJUALAN DIKELOMPOKKAN PER TANGGAL */
     async function loadReportData() {
       const type = document.getElementById('report-type').value;
       const allSales = await getAllFromStore('sales');
@@ -914,34 +904,71 @@
         return true;
       });
 
-      let omset = 0, profit = 0;
+      const titleMap = { today: 'Laporan Penjualan Hari Ini', month: 'Laporan Penjualan Bulan Ini', year: 'Laporan Penjualan Tahun Ini' };
+      document.getElementById('report-title-display').textContent = titleMap[type] || 'Laporan Penjualan';
+      document.getElementById('rep-count').textContent = filtered.length;
+
+      // Hitung produk terlaris
       const itemCounts = {};
+      filtered.forEach(s => {
+        s.items.forEach(i => {
+          itemCounts[i.name] = (itemCounts[i.name] || 0) + i.qty;
+        });
+      });
+      drawDonutChart(itemCounts);
+
+      // Kelompokkan Transaksi Berdasarkan Tanggal
+      const groups = {};
+      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
+        const dateKey = new Date(s.timestamp).toLocaleDateString('id-ID', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(s);
+      });
+
       const tbody = document.getElementById('report-table-body');
       tbody.innerHTML = '';
 
-      filtered.reverse().forEach(s => {
-        omset += s.totalOmset;
-        profit += s.totalProfit;
-        const desc = s.items.map(i => {
-          itemCounts[i.name] = (itemCounts[i.name] || 0) + i.qty;
-          return `${i.name} (${i.qty})`;
-        }).join(', ');
+      if (Object.keys(groups).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--gray); padding:20px;">Belum ada transaksi pada periode ini.</td></tr>';
+        return;
+      }
 
+      for (const [dateLabel, salesInDate] of Object.entries(groups)) {
+        let dailyTotal = 0;
+
+        // Baris Header Tanggal
         tbody.innerHTML += `
-          <tr>
-            <td>${new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</td>
-            <td><span style="font-size:11px; padding:2px 4px; border-radius:4px; font-weight:700; background:#eee;">${s.paymentMethod || 'TUNAI'}</span></td>
-            <td>${desc}</td>
-            <td><b>Rp ${s.totalOmset.toLocaleString('id-ID')}</b></td>
+          <tr class="group-header">
+            <td colspan="4">📅 ${dateLabel}</td>
           </tr>
         `;
-      });
 
-      document.getElementById('rep-omset').textContent = 'Rp ' + omset.toLocaleString('id-ID');
-      document.getElementById('rep-profit').textContent = 'Rp ' + profit.toLocaleString('id-ID');
-      document.getElementById('rep-count').textContent = filtered.length;
+        // Baris Transaksi
+        salesInDate.forEach(s => {
+          dailyTotal += s.totalOmset;
+          const desc = s.items.map(i => `${i.name} (${i.qty})`).join(', ');
+          const timeOnly = new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-      drawDonutChart(itemCounts);
+          tbody.innerHTML += `
+            <tr>
+              <td>${timeOnly}</td>
+              <td><span style="font-size:11px; padding:2px 4px; border-radius:4px; font-weight:700; background:#eee;">${s.paymentMethod || 'TUNAI'}</span></td>
+              <td>${desc}</td>
+              <td>Rp ${s.totalOmset.toLocaleString('id-ID')}</td>
+            </tr>
+          `;
+        });
+
+        // Baris Subtotal Tanggal
+        tbody.innerHTML += `
+          <tr class="group-footer">
+            <td colspan="3" style="text-align:right;">Subtotal:</td>
+            <td><b>Rp ${dailyTotal.toLocaleString('id-ID')}</b></td>
+          </tr>
+        `;
+      }
     }
 
     function drawDonutChart(counts) {
@@ -1001,7 +1028,7 @@
       document.body.className = '';
     }
 
-    /* 8. RESET PRODUK BERSIH, RESET TRANSAKSI & CADANGAN */
+    /* 8. RESET DATA & CADANGAN */
     async function resetProductsData() {
       if (!confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA menu minuman yang ada?')) {
         return;
