@@ -375,9 +375,6 @@
         width: 58mm; padding: 2mm; font-family: monospace; color: #000;
         font-size: 11px; line-height: 1.2;
       }
-      body.printing-report #section-laporan, body.printing-report #section-laporan * { visibility: visible; }
-      body.printing-report #section-laporan { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-      body.printing-report .no-print { display: none !important; }
     }
   </style>
 </head>
@@ -393,7 +390,7 @@
     </div>
   </header>
 
-  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN PDF) -->
+  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN DALAM FORMAT PDF) -->
   <div id="morning-alert-banner">
     <div>
       <b>Perhatian Pagi:</b> Unduh laporan keuangan hari kemarin.
@@ -408,34 +405,31 @@
         <input type="text" id="search-product" class="search-input" placeholder="Cari nama barang..." oninput="handleSearch(this.value)">
       </div>
 
-      <!-- Kategori Filter -->
+      <!-- Kategori Filter Kasir -->
       <div class="category-scroll" id="pos-category-chips"></div>
 
       <div class="product-grid" id="pos-products"></div>
     </div>
 
-    <!-- 2. KELOLA PRODUK -->
+    <!-- 2. KELOLA PRODUK (KOLOM KELOLA KATEGORI TERPISAH DIHAPUS) -->
     <div id="section-produk" class="section">
-      <div class="card">
-        <h3 style="margin-bottom: 10px; font-size: 16px;">Kelola Kategori</h3>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="new-category-name" placeholder="Tambah kategori (misal: Paket, Snack)">
-          <button class="btn-standard" onclick="addCategory()">Tambah</button>
-        </div>
-        <div id="category-badge-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;"></div>
-      </div>
-
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Tambah / Edit Produk</h3>
         <input type="hidden" id="prod-id">
         <div class="form-group">
           <label>Nama Produk / Barang</label>
-          <input type="text" id="prod-name" placeholder="Misal: Nasi Goreng, Es Teh">
+          <input type="text" id="prod-name" placeholder="Misal: Ayam Geprek, Es Teh">
         </div>
+        
+        <!-- Dropdown Kategori + Tambah Baru di Tempat -->
         <div class="form-group">
           <label>Kategori</label>
-          <select id="prod-category"></select>
+          <div style="display: flex; gap: 8px;">
+            <select id="prod-category" style="flex: 1;"></select>
+            <button type="button" class="btn-standard" style="white-space: nowrap; padding: 0 12px;" onclick="promptNewCategory()">+ Kategori</button>
+          </div>
         </div>
+
         <div class="form-group">
           <label>Harga Jual (Rp)</label>
           <input type="number" id="prod-price" placeholder="Contoh: 10000">
@@ -456,7 +450,7 @@
       </div>
     </div>
 
-    <!-- 3. LAPORAN PENJUALAN -->
+    <!-- 3. LAPORAN PENJUALAN (DIAGRAM BATANG & CETAK PDF SERAGAM) -->
     <div id="section-laporan" class="section">
       <div class="card no-print">
         <div style="display: flex; gap: 8px;">
@@ -465,7 +459,7 @@
             <option value="month">Bulan Ini</option>
             <option value="year">Tahun Ini</option>
           </select>
-          <button class="btn-standard" style="background:#0288d1; white-space:nowrap;" onclick="printReportPDF()">Unduh PDF</button>
+          <button class="btn-standard" style="background:#0288d1; white-space:nowrap;" onclick="downloadCurrentReportPDF()">Unduh PDF</button>
         </div>
       </div>
 
@@ -474,11 +468,11 @@
         <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b> Transaksi (Klik baris untuk cek detail/foto)</p>
       </div>
 
+      <!-- Diagram Batang Produk Terlaris -->
       <div class="card">
         <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Produk Terlaris</h4>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
-          <canvas id="pieChart" width="220" height="220" style="width:220px; height:220px;"></canvas>
-          <div id="pie-legend" style="width:100%; display:flex; flex-direction:column; gap:6px; font-size:13px;"></div>
+        <div style="width: 100%; overflow-x: auto;">
+          <canvas id="barChart" width="600" height="240" style="width: 100%; max-height: 260px;"></canvas>
         </div>
       </div>
 
@@ -494,7 +488,6 @@
 
     <!-- 4. DATA & SETTING -->
     <div id="section-setting" class="section">
-      <!-- Edit Pengaturan Toko & Nota -->
       <div class="card">
         <h3 style="font-size: 16px; margin-bottom: 8px;">Pengaturan Toko / Tempat Jualan</h3>
         <p style="font-size: 13px; color: var(--gray); margin-bottom: 10px;">Nama tempat jualan ini akan tampil otomatis pada struk dan nota transaksi.</p>
@@ -505,7 +498,7 @@
         <button class="btn-standard" onclick="saveShopName()">Simpan Nama Toko</button>
       </div>
 
-      <!-- Manajemen Akun Kasir (Khusus Admin) -->
+      <!-- Manajemen Kasir (Khusus Admin) -->
       <div class="card" id="admin-user-card" style="display: none;">
         <h3 style="font-size: 16px; margin-bottom: 8px; color: var(--blue);">Manajemen Kasir (Khusus Admin)</h3>
         <div class="form-group">
@@ -741,7 +734,7 @@
     </button>
   </nav>
 
-  <!-- STRUK CETAK THERMAL 58MM (NAMA KASIR TIDAK DICETAK) -->
+  <!-- STRUK CETAK THERMAL 58MM -->
   <div id="receipt-area">
     <div style="text-align: center; margin-bottom: 4px;">
       <h2 style="font-size: 14px; margin: 0;" id="print-shop-name">VAN KASIR</h2>
@@ -789,7 +782,7 @@
       }
     }
 
-    /* 2. AUTHENTICATION & SESSION MANAGEMENT */
+    /* 2. AUTHENTICATION & SESSION */
     let currentUser = null;
 
     function initAuth() {
@@ -860,7 +853,7 @@
 
       const users = JSON.parse(localStorage.getItem('vk_users') || '[]');
       if (users.some(x => x.username.toLowerCase() === u.toLowerCase())) {
-        return alert('Username sudah digunakan, pilih username lain!');
+        return alert('Username sudah digunakan!');
       }
 
       users.push({ username: u, password: p, role: 'kasir', name: n });
@@ -896,7 +889,7 @@
       }
     }
 
-    /* 3. NAMA TEMPAT JUALAN / CABANG */
+    /* 3. NAMA TEMPAT JUALAN */
     function getShopName() {
       return localStorage.getItem('vk_shop_name') || 'VAN KASIR';
     }
@@ -908,120 +901,7 @@
       alert('Nama tempat jualan berhasil disimpan!');
     }
 
-    /* 4. NOTIFIKASI UNDUH LAPORAN PAGI (JAM 07.00+) DALAM FORMAT PDF */
-    function checkMorningReminder() {
-      const now = new Date();
-      const currentHour = now.getHours();
-      
-      const todayStr = now.toISOString().slice(0, 10);
-      const downloadKey = 'vk_downloaded_' + todayStr;
-      const alreadyDownloaded = localStorage.getItem(downloadKey);
-
-      const banner = document.getElementById('morning-alert-banner');
-      if (currentHour >= 7 && !alreadyDownloaded) {
-        banner.style.display = 'flex';
-      } else {
-        banner.style.display = 'none';
-      }
-    }
-
-    async function downloadYesterdayReport() {
-      const now = new Date();
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yStr = yesterday.toDateString();
-
-      const allSales = await getAllFromStore('sales');
-      const salesYesterday = allSales.filter(s => new Date(s.timestamp).toDateString() === yStr);
-
-      const dd = String(yesterday.getDate()).padStart(2, '0');
-      const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
-      const yyyy = yesterday.getFullYear();
-      const dateFormatted = `${dd}-${mm}-${yyyy}`;
-      const fileNameTitle = `Laporan harian tgl ${dateFormatted}`;
-
-      const totalOmset = salesYesterday.reduce((acc, curr) => acc + curr.totalOmset, 0);
-      const shopName = getShopName();
-
-      const printWindow = window.open('', '_blank');
-      
-      let rowsHtml = '';
-      if (salesYesterday.length === 0) {
-        rowsHtml = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#666;">Tidak ada transaksi penjualan pada tanggal ini.</td></tr>`;
-      } else {
-        salesYesterday.forEach(s => {
-          const timeOnly = new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-          const itemsList = s.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-          rowsHtml += `
-            <tr>
-              <td style="padding:8px; border:1px solid #ddd;">${timeOnly}</td>
-              <td style="padding:8px; border:1px solid #ddd;">${s.cashier || 'Kasir'}</td>
-              <td style="padding:8px; border:1px solid #ddd;">${s.paymentMethod || 'TUNAI'}</td>
-              <td style="padding:8px; border:1px solid #ddd;">${itemsList}</td>
-              <td style="padding:8px; border:1px solid #ddd; text-align:right;">Rp ${s.totalOmset.toLocaleString('id-ID')}</td>
-            </tr>
-          `;
-        });
-      }
-
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>${fileNameTitle}</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #212121; }
-            h2, h3, p { margin: 0 0 6px 0; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-            th { background-color: #2e7d32; color: white; padding: 8px 10px; border: 1px solid #2e7d32; text-align: left; }
-            .summary-box { margin-top: 20px; border-top: 2px solid #2e7d32; padding-top: 10px; text-align: right; }
-            @media print {
-              @page { margin: 1.5cm; }
-            }
-          </style>
-        </head>
-        <body>
-          <h2>${shopName}</h2>
-          <h3>LAPORAN KEUANGAN HARIAN</h3>
-          <p style="font-size: 13px; color: #555;">Tanggal Transaksi: <b>${dateFormatted}</b></p>
-          <p style="font-size: 12px; color: #777;">Dicetak pada: ${now.toLocaleString('id-ID')}</p>
-          
-          <table>
-            <thead>
-              <tr>
-                <th>Jam</th>
-                <th>Kasir</th>
-                <th>Metode</th>
-                <th>Daftar Item</th>
-                <th style="text-align:right;">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
-          </table>
-
-          <div class="summary-box">
-            <p>Total Transaksi: <b>${salesYesterday.length} Transaksi</b></p>
-            <p style="font-size: 16px; font-weight: bold; color: #2e7d32;">Total Pendapatan: Rp ${totalOmset.toLocaleString('id-ID')}</p>
-          </div>
-
-          <script>
-            window.onload = function() {
-              window.print();
-            };
-          <\/script>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-
-      const todayStr = now.toISOString().slice(0, 10);
-      localStorage.setItem('vk_downloaded_' + todayStr, 'true');
-      checkMorningReminder();
-    }
-
-    /* 5. INDEXEDDB */
+    /* 4. INDEXEDDB */
     let db;
     const request = indexedDB.open('OfflineVanPOS', 2);
 
@@ -1072,7 +952,7 @@
       });
     }
 
-    /* 6. MANAJEMEN KATEGORI */
+    /* 5. KATEGORI TERINTEGRASI DI FORM PRODUK */
     let activeCategory = 'Semua';
 
     function getCategories() {
@@ -1082,57 +962,52 @@
 
     function initCategories() {
       const cats = getCategories();
-      renderCategoryUI(cats);
+      renderCategoryChips(cats);
+      renderCategoryDropdown(cats);
     }
 
-    function addCategory() {
-      const val = document.getElementById('new-category-name').value.trim();
-      if (!val) return alert('Nama kategori wajib diisi!');
-      const cats = getCategories();
-      if (cats.some(c => c.toLowerCase() === val.toLowerCase())) {
-        return alert('Kategori sudah ada!');
-      }
-      cats.push(val);
-      localStorage.setItem('vk_categories', JSON.stringify(cats));
-      document.getElementById('new-category-name').value = '';
-      initCategories();
-    }
-
-    function removeCategory(cat) {
-      if (cat === 'Semua') return;
-      if (confirm(`Hapus kategori "${cat}"?`)) {
-        let cats = getCategories().filter(c => c !== cat);
-        localStorage.setItem('vk_categories', JSON.stringify(cats));
-        if (activeCategory === cat) activeCategory = 'Semua';
-        initCategories();
-        renderPosProducts();
-      }
-    }
-
-    function renderCategoryUI(cats) {
+    function renderCategoryChips(cats) {
       const scroll = document.getElementById('pos-category-chips');
       scroll.innerHTML = cats.map(c => `
         <div class="cat-chip ${c === activeCategory ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
       `).join('');
+    }
 
+    function renderCategoryDropdown(cats, selectedVal = null) {
       const select = document.getElementById('prod-category');
-      select.innerHTML = cats.filter(c => c !== 'Semua').map(c => `<option value="${c}">${c}</option>`).join('');
+      const filtered = cats.filter(c => c !== 'Semua');
+      select.innerHTML = filtered.map(c => `<option value="${c}">${c}</option>`).join('');
+      if (selectedVal && filtered.includes(selectedVal)) {
+        select.value = selectedVal;
+      }
+    }
 
-      const badgeList = document.getElementById('category-badge-list');
-      badgeList.innerHTML = cats.filter(c => c !== 'Semua').map(c => `
-        <span style="background:#e0e0e0; padding:4px 8px; border-radius:6px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
-          ${c} <b style="cursor:pointer; color:red;" onclick="removeCategory('${c}')">&times;</b>
-        </span>
-      `).join('');
+    function promptNewCategory() {
+      const newCat = prompt('Masukkan nama kategori baru (misal: Cemilan, Jus, Paket Hemat):');
+      if (!newCat) return;
+      const cleanCat = newCat.trim();
+      if (!cleanCat) return;
+
+      const cats = getCategories();
+      if (cats.some(c => c.toLowerCase() === cleanCat.toLowerCase())) {
+        alert('Kategori sudah tersedia!');
+        renderCategoryDropdown(cats, cleanCat);
+        return;
+      }
+
+      cats.push(cleanCat);
+      localStorage.setItem('vk_categories', JSON.stringify(cats));
+      renderCategoryChips(cats);
+      renderCategoryDropdown(cats, cleanCat);
     }
 
     function selectCategory(cat) {
       activeCategory = cat;
-      initCategories();
+      renderCategoryChips(getCategories());
       renderPosProducts();
     }
 
-    /* 7. NAVIGASI */
+    /* 6. NAVIGASI */
     function navigate(sec) {
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -1156,7 +1031,7 @@
       }
     }
 
-    /* 8. FORMAT & KAS */
+    /* 7. FORMAT ANGKA & KAS */
     function formatNumber(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
@@ -1235,7 +1110,7 @@
       calcChange();
     }
 
-    /* 9. CRUD PRODUK */
+    /* 8. CRUD PRODUK */
     async function saveProduct() {
       const id = document.getElementById('prod-id').value;
       const name = document.getElementById('prod-name').value.trim();
@@ -1299,7 +1174,7 @@
       `).join('');
     }
 
-    /* 10. KASIR & TRANSAKSI */
+    /* 9. KASIR & TRANSAKSI */
     let cart = [];
     let currentSearchKeyword = '';
 
@@ -1515,13 +1390,16 @@
       renderPosProducts();
     }
 
-    /* 11. LAPORAN DENGAN NAMA KASIR */
+    /* 10. DIAGRAM BATANG & RENDER LAPORAN */
+    let currentFilteredSales = [];
+    let currentReportTitle = 'Laporan Penjualan Hari Ini';
+
     async function loadReportData() {
       const type = document.getElementById('report-type').value;
       const allSales = await getAllFromStore('sales');
       const now = new Date();
 
-      const filtered = allSales.filter(s => {
+      currentFilteredSales = allSales.filter(s => {
         const d = new Date(s.timestamp);
         if (type === 'today') return d.toDateString() === now.toDateString();
         if (type === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
@@ -1530,19 +1408,20 @@
       });
 
       const titleMap = { today: 'Laporan Penjualan Hari Ini', month: 'Laporan Penjualan Bulan Ini', year: 'Laporan Penjualan Tahun Ini' };
-      document.getElementById('report-title-display').textContent = titleMap[type] || 'Laporan Penjualan';
-      document.getElementById('rep-count').textContent = filtered.length;
+      currentReportTitle = titleMap[type] || 'Laporan Penjualan';
+      document.getElementById('report-title-display').textContent = currentReportTitle;
+      document.getElementById('rep-count').textContent = currentFilteredSales.length;
 
       const itemCounts = {};
-      filtered.forEach(s => {
+      currentFilteredSales.forEach(s => {
         s.items.forEach(i => {
           itemCounts[i.name] = (itemCounts[i.name] || 0) + i.qty;
         });
       });
-      drawDonutChart(itemCounts);
+      drawBarChart(itemCounts);
 
       const groups = {};
-      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
+      currentFilteredSales.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
         const dateKey = new Date(s.timestamp).toLocaleDateString('id-ID', {
           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
@@ -1594,6 +1473,58 @@
       }
     }
 
+    /* RENDER DIAGRAM BATANG SECARA DINAMIS */
+    function drawBarChart(counts, targetCanvasId = 'barChart') {
+      const canvas = document.getElementById(targetCanvasId);
+      if (!canvas) return '';
+      const ctx = canvas.getContext('2d');
+
+      const items = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      canvas.width = 600;
+      canvas.height = Math.max(220, items.length * 36 + 40);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (items.length === 0) {
+        ctx.fillStyle = '#9e9e9e';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Belum ada data penjualan pada periode ini', canvas.width / 2, canvas.height / 2);
+        return canvas.toDataURL('image/png');
+      }
+
+      const maxVal = Math.max(...items.map(i => i[1]), 1);
+      const startX = 140;
+      const barHeight = 22;
+      const spacing = 14;
+      const maxBarWidth = canvas.width - startX - 70;
+
+      items.forEach(([name, val], idx) => {
+        const y = 20 + idx * (barHeight + spacing);
+        const barWidth = Math.max(6, (val / maxVal) * maxBarWidth);
+
+        // Label Nama Produk
+        ctx.fillStyle = '#333333';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(name.length > 16 ? name.substring(0, 14) + '..' : name, startX - 10, y + 16);
+
+        // Batang Diagram
+        ctx.fillStyle = '#2e7d32';
+        ctx.beginPath();
+        ctx.roundRect(startX, y, barWidth, barHeight, 4);
+        ctx.fill();
+
+        // Nilai Qty
+        ctx.fillStyle = '#1b5e20';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`${val} item`, startX + barWidth + 8, y + 16);
+      });
+
+      return canvas.toDataURL('image/png');
+    }
+
     async function viewTransactionDetail(saleId) {
       const allSales = await getAllFromStore('sales');
       const sale = allSales.find(s => s.id === saleId);
@@ -1640,64 +1571,169 @@
       document.getElementById('image-zoom-modal').style.display = 'none';
     }
 
-    function drawDonutChart(counts) {
-      const canvas = document.getElementById('pieChart');
-      const ctx = canvas.getContext('2d');
-      const legendBox = document.getElementById('pie-legend');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      legendBox.innerHTML = '';
+    /* 11. SISTEM TEMPLATE SERAGAM UNDUH LAPORAN PDF DENGAN DIAGRAM BATANG */
+    function openReportPrintPreview(salesList, reportTitle, dateSubtitle, fileNamePdf) {
+      const totalOmset = salesList.reduce((acc, curr) => acc + curr.totalOmset, 0);
+      const shopName = getShopName();
+      const now = new Date();
 
-      const labels = Object.keys(counts);
-      const values = Object.values(counts);
-      const total = values.reduce((a, b) => a + b, 0);
+      // Hitung item counts untuk diagram batang di PDF
+      const counts = {};
+      salesList.forEach(s => {
+        s.items.forEach(i => {
+          counts[i.name] = (counts[i.name] || 0) + i.qty;
+        });
+      });
 
-      if (total === 0) {
-        ctx.fillStyle = '#9e9e9e';
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Belum ada penjualan', canvas.width / 2, canvas.height / 2);
-        return;
+      // Render chart ke canvas sementara untuk disematkan sebagai gambar di PDF
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.id = 'tempReportCanvas';
+      document.body.appendChild(tempCanvas);
+      const chartImgData = drawBarChart(counts, 'tempReportCanvas');
+      document.body.removeChild(tempCanvas);
+
+      let rowsHtml = '';
+      if (salesList.length === 0) {
+        rowsHtml = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#666;">Tidak ada transaksi penjualan pada periode ini.</td></tr>`;
+      } else {
+        salesList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)).forEach(s => {
+          const timeOnly = new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+          const itemsList = s.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+          rowsHtml += `
+            <tr>
+              <td style="padding:8px; border:1px solid #ddd;">${timeOnly}</td>
+              <td style="padding:8px; border:1px solid #ddd;">${s.cashier || 'Kasir'}</td>
+              <td style="padding:8px; border:1px solid #ddd;">${s.paymentMethod || 'TUNAI'}</td>
+              <td style="padding:8px; border:1px solid #ddd;">${itemsList}</td>
+              <td style="padding:8px; border:1px solid #ddd; text-align:right;">Rp ${s.totalOmset.toLocaleString('id-ID')}</td>
+            </tr>
+          `;
+        });
       }
 
-      const colors = ['#2e7d32', '#ff8f00', '#1976d2', '#d32f2f', '#7b1fa2', '#0097a7', '#5d4037'];
-      let startAngle = 0;
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = 80;
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${fileNamePdf}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #212121; }
+            h2 { margin: 0 0 4px 0; color: #1b5e20; }
+            h3 { margin: 0 0 6px 0; font-size: 15px; }
+            p { margin: 0 0 4px 0; font-size: 12px; color: #555; }
+            .chart-box { margin-top: 15px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; padding: 12px; text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+            th { background-color: #2e7d32; color: white; padding: 8px 10px; border: 1px solid #2e7d32; text-align: left; }
+            .summary-box { margin-top: 20px; border-top: 2px solid #2e7d32; padding-top: 10px; text-align: right; }
+            @media print {
+              @page { margin: 1.2cm; }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>${shopName}</h2>
+          <h3>${reportTitle.toUpperCase()}</h3>
+          <p>Periode: <b>${dateSubtitle}</b></p>
+          <p>Waktu Unduh: ${now.toLocaleString('id-ID')}</p>
 
-      labels.forEach((label, idx) => {
-        const sliceAngle = (values[idx] / total) * 2 * Math.PI;
-        const color = colors[idx % colors.length];
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-        ctx.arc(centerX, centerY, 40, startAngle + sliceAngle, startAngle, true);
-        ctx.closePath();
-        ctx.fillStyle = color;
-        ctx.fill();
-
-        startAngle += sliceAngle;
-
-        const percent = Math.round((values[idx] / total) * 100);
-        legendBox.innerHTML += `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:14px; height:14px; border-radius:3px; background:${color}; display:inline-block;"></span>
-              <b>${label}</b>
-            </div>
-            <span>${values[idx]} item (${percent}%)</span>
+          <div class="chart-box">
+            <h4 style="margin: 0 0 8px 0; font-size: 13px; text-align: left; color: #2e7d32;">Diagram Penjualan Produk</h4>
+            <img src="${chartImgData}" style="max-width: 100%; height: auto; display: block; margin: auto;">
           </div>
-        `;
-      });
+
+          <table>
+            <thead>
+              <tr>
+                <th>Jam</th>
+                <th>Kasir</th>
+                <th>Metode</th>
+                <th>Daftar Item</th>
+                <th style="text-align:right;">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <p>Total Transaksi: <b>${salesList.length} Transaksi</b></p>
+            <p style="font-size: 16px; font-weight: bold; color: #2e7d32;">Total Pendapatan: Rp ${totalOmset.toLocaleString('id-ID')}</p>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
 
-    function printReportPDF() {
-      document.body.className = 'printing-report';
-      window.print();
-      document.body.className = '';
+    function downloadCurrentReportPDF() {
+      const type = document.getElementById('report-type').value;
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const dateFormatted = `${dd}-${mm}-${yyyy}`;
+
+      let subtitle = dateFormatted;
+      if (type === 'month') subtitle = now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+      if (type === 'year') subtitle = String(yyyy);
+
+      const fileName = `Laporan harian tgl ${dateFormatted}`;
+      openReportPrintPreview(currentFilteredSales, currentReportTitle, subtitle, fileName);
     }
 
-    /* 12. RESET DATA & CADANGAN */
+    /* 12. PENGINGAT PAGI JAM 07.00 DENGAN TEMPLATE SERAGAM */
+    function checkMorningReminder() {
+      const now = new Date();
+      const currentHour = now.getHours();
+      
+      const todayStr = now.toISOString().slice(0, 10);
+      const downloadKey = 'vk_downloaded_' + todayStr;
+      const alreadyDownloaded = localStorage.getItem(downloadKey);
+
+      const banner = document.getElementById('morning-alert-banner');
+      if (currentHour >= 7 && !alreadyDownloaded) {
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    async function downloadYesterdayReport() {
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = yesterday.toDateString();
+
+      const allSales = await getAllFromStore('sales');
+      const salesYesterday = allSales.filter(s => new Date(s.timestamp).toDateString() === yStr);
+
+      const dd = String(yesterday.getDate()).padStart(2, '0');
+      const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+      const yyyy = yesterday.getFullYear();
+      const dateFormatted = `${dd}-${mm}-${yyyy}`;
+      const fileNameTitle = `Laporan harian tgl ${dateFormatted}`;
+
+      openReportPrintPreview(
+        salesYesterday,
+        'Laporan Penjualan Kemarin',
+        dateFormatted,
+        fileNameTitle
+      );
+
+      const todayStr = now.toISOString().slice(0, 10);
+      localStorage.setItem('vk_downloaded_' + todayStr, 'true');
+      checkMorningReminder();
+    }
+
+    /* 13. CADANGAN & RESET DATA */
     async function resetProductsData() {
       if (!confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA produk yang ada?')) {
         return;
