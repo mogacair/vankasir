@@ -71,7 +71,7 @@
     }
     .btn-header:active { background: rgba(255,255,255,0.4); }
 
-    /* BANNER DOWNLOAD PAGI */
+    /* BANNER NOTIFIKASI PAGI */
     #morning-alert-banner {
       display: none;
       background: #fff3e0;
@@ -93,7 +93,7 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* FILTER KATEGORI */
+    /* TAB KATEGORI KASIR */
     .category-scroll {
       display: flex;
       gap: 8px;
@@ -393,12 +393,12 @@
     </div>
   </header>
 
-  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN) -->
+  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN PDF) -->
   <div id="morning-alert-banner">
     <div>
       <b>Perhatian Pagi:</b> Unduh laporan keuangan hari kemarin.
     </div>
-    <button class="btn-standard" style="padding: 5px 10px; font-size: 12px; background: #e65100;" onclick="downloadYesterdayReport()">Unduh Sekarang</button>
+    <button class="btn-standard" style="padding: 5px 10px; font-size: 12px; background: #e65100;" onclick="downloadYesterdayReport()">Unduh Sekarang (PDF)</button>
   </div>
 
   <main>
@@ -497,15 +497,15 @@
       <!-- Edit Pengaturan Toko & Nota -->
       <div class="card">
         <h3 style="font-size: 16px; margin-bottom: 8px;">Pengaturan Toko / Tempat Jualan</h3>
-        <p style="font-size: 13px; color: var(--gray); margin-bottom: 10px;">Sesuaikan nama tempat atau cabang jualan yang dicetak pada struk.</p>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 10px;">Nama tempat jualan ini akan tampil otomatis pada struk dan nota transaksi.</p>
         <div class="form-group">
-          <label>Nama Tempat Jualan / Outlet</label>
+          <label>Nama Tempat Jualan / Cabang</label>
           <input type="text" id="shop-name-input" placeholder="Contoh: Van Kasir - Cabang Alun-Alun">
         </div>
         <button class="btn-standard" onclick="saveShopName()">Simpan Nama Toko</button>
       </div>
 
-      <!-- Manajemen Akun Kasir (Hanya Admin) -->
+      <!-- Manajemen Akun Kasir (Khusus Admin) -->
       <div class="card" id="admin-user-card" style="display: none;">
         <h3 style="font-size: 16px; margin-bottom: 8px; color: var(--blue);">Manajemen Kasir (Khusus Admin)</h3>
         <div class="form-group">
@@ -741,7 +741,7 @@
     </button>
   </nav>
 
-  <!-- STRUK CETAK THERMAL 58MM (NAMA KASIR TIDAK DICETAK SESUAI INSTRUKSI) -->
+  <!-- STRUK CETAK THERMAL 58MM (NAMA KASIR TIDAK DICETAK) -->
   <div id="receipt-area">
     <div style="text-align: center; margin-bottom: 4px;">
       <h2 style="font-size: 14px; margin: 0;" id="print-shop-name">VAN KASIR</h2>
@@ -908,7 +908,7 @@
       alert('Nama tempat jualan berhasil disimpan!');
     }
 
-    /* 4. NOTIFIKASI UNDUH LAPORAN PAGI (JAM 07.00+) */
+    /* 4. NOTIFIKASI UNDUH LAPORAN PAGI (JAM 07.00+) DALAM FORMAT PDF */
     function checkMorningReminder() {
       const now = new Date();
       const currentHour = now.getHours();
@@ -934,32 +934,91 @@
       const allSales = await getAllFromStore('sales');
       const salesYesterday = allSales.filter(s => new Date(s.timestamp).toDateString() === yStr);
 
+      const dd = String(yesterday.getDate()).padStart(2, '0');
+      const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+      const yyyy = yesterday.getFullYear();
+      const dateFormatted = `${dd}-${mm}-${yyyy}`;
+      const fileNameTitle = `Laporan harian tgl ${dateFormatted}`;
+
       const totalOmset = salesYesterday.reduce((acc, curr) => acc + curr.totalOmset, 0);
-      const reportPayload = {
-        tanggalUnduh: now.toISOString(),
-        periodeLaporan: yesterday.toISOString().slice(0, 10),
-        totalTransaksi: salesYesterday.length,
-        totalOmset: totalOmset,
-        transaksi: salesYesterday
-      };
+      const shopName = getShopName();
 
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      const dateFormatted = `${yyyy}-${mm}-${dd}`;
+      const printWindow = window.open('', '_blank');
       
-      const fileName = `LAP_${dateFormatted}_${dateFormatted}_.json`;
+      let rowsHtml = '';
+      if (salesYesterday.length === 0) {
+        rowsHtml = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#666;">Tidak ada transaksi penjualan pada tanggal ini.</td></tr>`;
+      } else {
+        salesYesterday.forEach(s => {
+          const timeOnly = new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+          const itemsList = s.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+          rowsHtml += `
+            <tr>
+              <td style="padding:8px; border:1px solid #ddd;">${timeOnly}</td>
+              <td style="padding:8px; border:1px solid #ddd;">${s.cashier || 'Kasir'}</td>
+              <td style="padding:8px; border:1px solid #ddd;">${s.paymentMethod || 'TUNAI'}</td>
+              <td style="padding:8px; border:1px solid #ddd;">${itemsList}</td>
+              <td style="padding:8px; border:1px solid #ddd; text-align:right;">Rp ${s.totalOmset.toLocaleString('id-ID')}</td>
+            </tr>
+          `;
+        });
+      }
 
-      const blob = new Blob([JSON.stringify(reportPayload, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = fileName;
-      a.click();
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${fileNameTitle}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #212121; }
+            h2, h3, p { margin: 0 0 6px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+            th { background-color: #2e7d32; color: white; padding: 8px 10px; border: 1px solid #2e7d32; text-align: left; }
+            .summary-box { margin-top: 20px; border-top: 2px solid #2e7d32; padding-top: 10px; text-align: right; }
+            @media print {
+              @page { margin: 1.5cm; }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>${shopName}</h2>
+          <h3>LAPORAN KEUANGAN HARIAN</h3>
+          <p style="font-size: 13px; color: #555;">Tanggal Transaksi: <b>${dateFormatted}</b></p>
+          <p style="font-size: 12px; color: #777;">Dicetak pada: ${now.toLocaleString('id-ID')}</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Jam</th>
+                <th>Kasir</th>
+                <th>Metode</th>
+                <th>Daftar Item</th>
+                <th style="text-align:right;">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <p>Total Transaksi: <b>${salesYesterday.length} Transaksi</b></p>
+            <p style="font-size: 16px; font-weight: bold; color: #2e7d32;">Total Pendapatan: Rp ${totalOmset.toLocaleString('id-ID')}</p>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
 
       const todayStr = now.toISOString().slice(0, 10);
       localStorage.setItem('vk_downloaded_' + todayStr, 'true');
       checkMorningReminder();
-      alert('Laporan berhasil diunduh: ' + fileName);
     }
 
     /* 5. INDEXEDDB */
