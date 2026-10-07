@@ -93,7 +93,7 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* TAB KATEGORI KASIR */
+    /* TAB FILTER KATEGORI DI KASIR */
     .category-scroll {
       display: flex;
       gap: 8px;
@@ -390,7 +390,7 @@
     </div>
   </header>
 
-  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN DALAM FORMAT PDF) -->
+  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN DALAM PDF) -->
   <div id="morning-alert-banner">
     <div>
       <b>Perhatian Pagi:</b> Unduh laporan keuangan hari kemarin.
@@ -411,7 +411,7 @@
       <div class="product-grid" id="pos-products"></div>
     </div>
 
-    <!-- 2. KELOLA PRODUK (KOLOM KELOLA KATEGORI TERPISAH DIHAPUS) -->
+    <!-- 2. KELOLA PRODUK (KOLOM KATEGORI TERINTEGRASI) -->
     <div id="section-produk" class="section">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-size: 16px;">Tambah / Edit Produk</h3>
@@ -421,7 +421,7 @@
           <input type="text" id="prod-name" placeholder="Misal: Ayam Geprek, Es Teh">
         </div>
         
-        <!-- Dropdown Kategori + Tambah Baru di Tempat -->
+        <!-- Pilihan Dropdown Kategori + Tambah Baru -->
         <div class="form-group">
           <label>Kategori</label>
           <div style="display: flex; gap: 8px;">
@@ -889,7 +889,7 @@
       }
     }
 
-    /* 3. NAMA TEMPAT JUALAN */
+    /* 3. PENGATURAN TOKO */
     function getShopName() {
       return localStorage.getItem('vk_shop_name') || 'VAN KASIR';
     }
@@ -901,7 +901,7 @@
       alert('Nama tempat jualan berhasil disimpan!');
     }
 
-    /* 4. INDEXEDDB */
+    /* 4. BASIS DATA INDEXEDDB */
     let db;
     const request = indexedDB.open('OfflineVanPOS', 2);
 
@@ -952,7 +952,7 @@
       });
     }
 
-    /* 5. KATEGORI TERINTEGRASI DI FORM PRODUK */
+    /* 5. KATEGORI TERPADU PADA FORMULIR */
     let activeCategory = 'Semua';
 
     function getCategories() {
@@ -1007,7 +1007,7 @@
       renderPosProducts();
     }
 
-    /* 6. NAVIGASI */
+    /* 6. NAVIGASI ANTARMUKA */
     function navigate(sec) {
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -1031,7 +1031,7 @@
       }
     }
 
-    /* 7. FORMAT ANGKA & KAS */
+    /* 7. FORMAT ANGKA & TRANSAKSI TUNAI */
     function formatNumber(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
@@ -1174,7 +1174,7 @@
       `).join('');
     }
 
-    /* 9. KASIR & TRANSAKSI */
+    /* 9. KASIR & PEMESANAN */
     let cart = [];
     let currentSearchKeyword = '';
 
@@ -1473,7 +1473,6 @@
       }
     }
 
-    /* RENDER DIAGRAM BATANG SECARA DINAMIS */
     function drawBarChart(counts, targetCanvasId = 'barChart') {
       const canvas = document.getElementById(targetCanvasId);
       if (!canvas) return '';
@@ -1503,19 +1502,16 @@
         const y = 20 + idx * (barHeight + spacing);
         const barWidth = Math.max(6, (val / maxVal) * maxBarWidth);
 
-        // Label Nama Produk
         ctx.fillStyle = '#333333';
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText(name.length > 16 ? name.substring(0, 14) + '..' : name, startX - 10, y + 16);
 
-        // Batang Diagram
         ctx.fillStyle = '#2e7d32';
         ctx.beginPath();
         ctx.roundRect(startX, y, barWidth, barHeight, 4);
         ctx.fill();
 
-        // Nilai Qty
         ctx.fillStyle = '#1b5e20';
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'left';
@@ -1571,13 +1567,15 @@
       document.getElementById('image-zoom-modal').style.display = 'none';
     }
 
-    /* 11. SISTEM TEMPLATE SERAGAM UNDUH LAPORAN PDF DENGAN DIAGRAM BATANG */
+    /* 11. SISTEM TEMPLATE SERAGAM UNDUH PDF (LANGSUNG TANPA PINDAH KE GOOGLE CHROME) */
     function openReportPrintPreview(salesList, reportTitle, dateSubtitle, fileNamePdf) {
       const totalOmset = salesList.reduce((acc, curr) => acc + curr.totalOmset, 0);
       const shopName = getShopName();
       const now = new Date();
 
-      // Hitung item counts untuk diagram batang di PDF
+      const originalTitle = document.title;
+      document.title = fileNamePdf;
+
       const counts = {};
       salesList.forEach(s => {
         s.items.forEach(i => {
@@ -1585,7 +1583,6 @@
         });
       });
 
-      // Render chart ke canvas sementara untuk disematkan sebagai gambar di PDF
       const tempCanvas = document.createElement('canvas');
       tempCanvas.id = 'tempReportCanvas';
       document.body.appendChild(tempCanvas);
@@ -1611,8 +1608,22 @@
         });
       }
 
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
+      let printFrame = document.getElementById('report-print-frame');
+      if (printFrame) printFrame.remove();
+
+      printFrame = document.createElement('iframe');
+      printFrame.id = 'report-print-frame';
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = 'none';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.open();
+      frameDoc.write(`
         <!DOCTYPE html>
         <html>
         <head>
@@ -1661,16 +1672,16 @@
             <p>Total Transaksi: <b>${salesList.length} Transaksi</b></p>
             <p style="font-size: 16px; font-weight: bold; color: #2e7d32;">Total Pendapatan: Rp ${totalOmset.toLocaleString('id-ID')}</p>
           </div>
-
-          <script>
-            window.onload = function() {
-              window.print();
-            };
-          <\/script>
         </body>
         </html>
       `);
-      printWindow.document.close();
+      frameDoc.close();
+
+      setTimeout(() => {
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+        document.title = originalTitle;
+      }, 400);
     }
 
     function downloadCurrentReportPDF() {
@@ -1689,7 +1700,7 @@
       openReportPrintPreview(currentFilteredSales, currentReportTitle, subtitle, fileName);
     }
 
-    /* 12. PENGINGAT PAGI JAM 07.00 DENGAN TEMPLATE SERAGAM */
+    /* 12. PENGINGAT PAGI (JAM 07.00+) */
     function checkMorningReminder() {
       const now = new Date();
       const currentHour = now.getHours();
