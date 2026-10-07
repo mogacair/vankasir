@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Van Kasir</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2e7d32">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-dark: #1b5e20;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --text: #212121;
+      --gray: #616161;
+      --border: #cccccc;
+      --accent: #e65100;
+      --danger: #d32f2f;
+      --blue: #1565c0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      font-size: 15px;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 18px; font-weight: 700; }
+    .header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .btn-header {
+      background: rgba(255,255,255,0.25);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .btn-header:active { background: rgba(255,255,255,0.4); }
+
+    /* BANNER DOWNLOAD PAGI */
+    #morning-alert-banner {
+      display: none;
+      background: #fff3e0;
+      border-bottom: 2px solid #ff9800;
+      padding: 10px 14px;
+      color: #bf360c;
+      font-size: 13px;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      padding-bottom: 125px;
+    }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* FILTER KATEGORI */
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .cat-chip.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .search-box-wrapper {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #ffffff;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 12px;
+    }
+    .card-product {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 96px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+      position: relative;
+    }
+    .card-product:active { background-color: #e8f5e9; transform: scale(0.96); }
+    .card-product .name { font-size: 14px; font-weight: 700; line-height: 1.25; margin-bottom: 4px; }
+    .card-product .cat-tag { font-size: 10px; color: var(--gray); margin-bottom: 6px; font-weight: 600; }
+    .card-product .price { font-size: 13px; color: var(--primary); font-weight: 800; }
+    .card-product .badge-qty {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 2px 7px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    #floating-cart-bar {
+      display: none;
+      position: fixed;
+      bottom: 72px;
+      left: 14px;
+      right: 14px;
+      background: var(--primary-dark);
+      color: white;
+      border-radius: 12px;
+      padding: 8px 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      z-index: 90;
+      align-items: center;
+      justify-content: space-between;
+      animation: popUp 0.2s ease-out;
+    }
+    @keyframes popUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .floating-cart-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-bottom-sheet {
+      background: var(--surface);
+      border-radius: 18px 18px 0 0;
+      padding: 18px 16px 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
+      animation: slideUp 0.25s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-dialog {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 20px;
+      width: 90%;
+      max-width: 340px;
+      margin: auto;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    #image-zoom-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.92);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #image-zoom-modal img {
+      max-width: 95%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .cart-items { max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .cart-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
+    .cart-qty-ctrl { display: flex; align-items: center; gap: 8px; }
+    .btn-circle {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border); background: #f5f5f5;
+      font-size: 16px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pay-method-selector { display: flex; gap: 8px; margin-top: 4px; }
+    .pay-tab {
+      flex: 1; padding: 10px; text-align: center; border-radius: 8px;
+      border: 1px solid var(--border); background: #fafafa;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .pay-tab.active { background: #e8f5e9; border-color: var(--primary); color: var(--primary-dark); }
+
+    .quick-cash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+    .btn-quick-cash {
+      padding: 8px 4px; background: #f1f3f4; border: 1px solid #dcdcdc;
+      border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .btn-quick-cash:active { background: #e0e0e0; }
+
+    #qris-wrapper {
+      display: none;
+      margin-top: 10px;
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      background: #fafafa;
+      text-align: center;
+    }
+    .btn-capture {
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #qris-preview-img {
+      max-width: 100%;
+      max-height: 140px;
+      border-radius: 6px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .checkout-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-action {
+      flex: 1; padding: 13px 8px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .btn-save-only { background: #f57c00; color: white; }
+    .btn-save-print { background: var(--primary); color: white; }
+
+    nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 62px;
+      background: var(--surface);
+      display: flex;
+      border-top: 1px solid var(--border);
+      z-index: 80;
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--gray);
+      font-size: 12px;
+      font-weight: 600;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .nav-btn.active { color: var(--primary); font-weight: 800; }
+    .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+    .card { background: var(--surface); padding: 14px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; }
+    .form-group { margin-bottom: 10px; }
+    label { font-size: 13px; font-weight: 700; color: var(--gray); display: block; margin-bottom: 4px; }
+    input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
+    .btn-standard { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-danger { background: var(--danger); color: white; border: none; padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+    .table-container { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow-x: auto; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #f5f5f5; font-weight: 700; }
+
+    tr.clickable-row:active { background-color: #f1f8e9; }
+    tr.group-header td {
+      background: #e8f5e9;
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 10px;
+    }
+    tr.group-footer td {
+      background: #fafafa;
+      font-weight: 700;
+      font-size: 13px;
+      border-bottom: 2px solid #ccc;
+    }
+
+    #receipt-area { display: none; }
+    @media print {
+      body * { visibility: hidden; }
+      body.printing-receipt #receipt-area, body.printing-receipt #receipt-area * { visibility: visible; }
+      body.printing-receipt #receipt-area {
+        display: block !important; position: absolute; left: 0; top: 0;
+        width: 58mm; padding: 2mm; font-family: monospace; color: #000;
+        font-size: 11px; line-height: 1.2;
+      }
+      body.printing-report #section-laporan, body.printing-report #section-laporan * { visibility: visible; }
+      body.printing-report #section-laporan { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+      body.printing-report .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <h1 id="page-title">Van Kasir</h1>
+    <div class="header-actions">
+      <span id="current-user-badge" style="font-size: 11px; background: rgba(0,0,0,0.25); padding: 4px 8px; border-radius: 6px;"></span>
+      <button class="btn-header" onclick="logout()">Keluar</button>
+      <button class="btn-header" onclick="hardClearCache()">Update</button>
+    </div>
+  </header>
+
+  <!-- PERINGATAN PAGI HARI (UNDUH LAPORAN KEMARIN) -->
+  <div id="morning-alert-banner">
+    <div>
+      <b>Perhatian Pagi:</b> Unduh laporan keuangan hari kemarin.
+    </div>
+    <button class="btn-standard" style="padding: 5px 10px; font-size: 12px; background: #e65100;" onclick="downloadYesterdayReport()">Unduh Sekarang</button>
+  </div>
+
+  <main>
+    <!-- 1. KASIR -->
+    <div id="section-kasir" class="section active">
+      <div class="search-box-wrapper">
+        <input type="text" id="search-product" class="search-input" placeholder="Cari nama barang..." oninput="handleSearch(this.value)">
+      </div>
+
+      <!-- Kategori Filter -->
+      <div class="category-scroll" id="pos-category-chips"></div>
+
+      <div class="product-grid" id="pos-products"></div>
+    </div>
+
+    <!-- 2. KELOLA PRODUK -->
+    <div id="section-produk" class="section">
+      <div class="card">
+        <h3 style="margin-bottom: 10px; font-size: 16px;">Kelola Kategori</h3>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="new-category-name" placeholder="Tambah kategori (misal: Paket, Snack)">
+          <button class="btn-standard" onclick="addCategory()">Tambah</button>
+        </div>
+        <div id="category-badge-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom: 10px; font-size: 16px;">Tambah / Edit Produk</h3>
+        <input type="hidden" id="prod-id">
+        <div class="form-group">
+          <label>Nama Produk / Barang</label>
+          <input type="text" id="prod-name" placeholder="Misal: Nasi Goreng, Es Teh">
+        </div>
+        <div class="form-group">
+          <label>Kategori</label>
+          <select id="prod-category"></select>
+        </div>
+        <div class="form-group">
+          <label>Harga Jual (Rp)</label>
+          <input type="number" id="prod-price" placeholder="Contoh: 10000">
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button class="btn-standard" onclick="saveProduct()">Simpan Produk</button>
+          <button class="btn-standard" style="background:#757575;" onclick="resetProductForm()">Batal</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Nama Produk</th><th>Kategori</th><th>Harga</th><th>Aksi</th></tr>
+          </thead>
+          <tbody id="product-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. LAPORAN PENJUALAN -->
+    <div id="section-laporan" class="section">
+      <div class="card no-print">
+        <div style="display: flex; gap: 8px;">
+          <select id="report-type" onchange="loadReportData()">
+            <option value="today">Hari Ini</option>
+            <option value="month">Bulan Ini</option>
+            <option value="year">Tahun Ini</option>
+          </select>
+          <button class="btn-standard" style="background:#0288d1; white-space:nowrap;" onclick="printReportPDF()">Unduh PDF</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding-bottom: 6px;">
+        <h3 style="font-size: 16px; margin-bottom: 4px;" id="report-title-display">Laporan Penjualan</h3>
+        <p style="font-size: 13px; color: var(--gray);">Total Transaksi: <b id="rep-count">0</b> Transaksi (Klik baris untuk cek detail/foto)</p>
+      </div>
+
+      <div class="card">
+        <h4 style="font-size: 15px; margin-bottom: 10px;">Diagram Produk Terlaris</h4>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+          <canvas id="pieChart" width="220" height="220" style="width:220px; height:220px;"></canvas>
+          <div id="pie-legend" style="width:100%; display:flex; flex-direction:column; gap:6px; font-size:13px;"></div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Jam</th><th>Kasir</th><th>Metode</th><th>Item</th><th>Total</th></tr>
+          </thead>
+          <tbody id="report-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. DATA & SETTING -->
+    <div id="section-setting" class="section">
+      <!-- Edit Pengaturan Toko & Nota -->
+      <div class="card">
+        <h3 style="font-size: 16px; margin-bottom: 8px;">Pengaturan Toko / Tempat Jualan</h3>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 10px;">Sesuaikan nama tempat atau cabang jualan yang dicetak pada struk.</p>
+        <div class="form-group">
+          <label>Nama Tempat Jualan / Outlet</label>
+          <input type="text" id="shop-name-input" placeholder="Contoh: Van Kasir - Cabang Alun-Alun">
+        </div>
+        <button class="btn-standard" onclick="saveShopName()">Simpan Nama Toko</button>
+      </div>
+
+      <!-- Manajemen Akun Kasir (Hanya Admin) -->
+      <div class="card" id="admin-user-card" style="display: none;">
+        <h3 style="font-size: 16px; margin-bottom: 8px; color: var(--blue);">Manajemen Kasir (Khusus Admin)</h3>
+        <div class="form-group">
+          <label>Username Baru</label>
+          <input type="text" id="new-user-username" placeholder="Username untuk login">
+        </div>
+        <div class="form-group">
+          <label>Password Baru</label>
+          <input type="password" id="new-user-password" placeholder="Password login">
+        </div>
+        <div class="form-group">
+          <label>Nama Kasir Bertugas</label>
+          <input type="text" id="new-user-fullname" placeholder="Contoh: Budi Santoso">
+        </div>
+        <button class="btn-standard" style="background: var(--blue);" onclick="addUserAccount()">Tambah User Kasir</button>
+
+        <div class="table-container" style="margin-top: 12px;">
+          <table>
+            <thead><tr><th>Username</th><th>Nama Kasir</th><th>Aksi</th></tr></thead>
+            <tbody id="user-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 16px; margin-bottom: 8px;">Cadangkan & Pulihkan</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn-standard" style="background:#388e3c;" onclick="exportDataBackup()">Download File Cadangan (.json)</button>
+          <hr style="border:0; border-top:1px solid var(--border);">
+          <label>Pulihkan Data dari File Cadangan:</label>
+          <input type="file" id="import-file" accept=".json">
+          <button class="btn-standard" style="background:#f57c00;" onclick="importDataBackup()">Pulihkan Sekarang</button>
+        </div>
+      </div>
+
+      <div class="card" style="border: 1px solid #ffe082; background: #fffdf6;">
+        <h3 style="font-size: 16px; margin-bottom: 6px; color: #f57f17;">Reset Data Barang Dagangan</h3>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">Menghapus SEMUA daftar produk dagangan sampai kosong.</p>
+        <button class="btn-standard" style="background:#fbc02d; color:#000;" onclick="resetProductsData()">Hapus Bersih Semua Produk</button>
+      </div>
+
+      <div class="card" style="border: 1px solid #ef9a9a; background: #fffbfb;">
+        <h3 style="font-size: 16px; margin-bottom: 6px; color: var(--danger);">Reset Data Transaksi</h3>
+        <p style="font-size: 13px; color: var(--gray); margin-bottom: 12px;">Menghapus semua riwayat transaksi penjualan (tutup buku).</p>
+        <button class="btn-danger" onclick="resetSalesData()">Hapus Semua Transaksi</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL LOGIN -->
+  <div id="login-modal" class="modal-backdrop" style="display: flex; align-items: center;">
+    <div class="modal-dialog">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <h2 style="font-size: 20px; color: var(--primary);">Masuk Van Kasir</h2>
+        <p style="font-size: 12px; color: var(--gray);">Silakan login sebelum bertransaksi</p>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="Masukkan username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Masukkan password">
+      </div>
+      <button class="btn-standard" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">Masuk</button>
+    </div>
+  </div>
+
+  <!-- FLOATING CART BAR -->
+  <div id="floating-cart-bar">
+    <div class="floating-cart-left" onclick="openPaymentModal()">
+      <span id="floating-cart-count" style="background: var(--accent); padding: 3px 9px; border-radius: 12px; font-weight: 800; font-size: 13px;">0 Item</span>
+      <span id="floating-cart-total" style="font-size: 16px; font-weight: 800;">Rp 0</span>
+    </div>
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <button style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;" onclick="clearCurrentCart()">Reset</button>
+      <button style="background: white; border: none; color: var(--primary-dark); padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer;" onclick="openPaymentModal()">Bayar &rarr;</button>
+    </div>
+  </div>
+
+  <!-- MODAL PEMBAYARAN -->
+  <div id="payment-modal" class="modal-backdrop">
+    <div class="modal-bottom-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h3 style="font-size: 17px; font-weight: 800;">Rincian Pesanan</h3>
+          <button style="background: #ffebee; color: var(--danger); border: 1px solid #ffcdd2; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer;" onclick="clearCurrentCart()">Reset Pesanan</button>
+        </div>
+        <button style="border: none; background: #e0e0e0; border-radius: 50%; width: 28px; height: 28px; font-weight: 800; cursor: pointer;" onclick="closePaymentModal()">&times;</button>
+      </div>
+
+      <div class="cart-items" id="cart-list"></div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; padding: 8px 0; border-top: 2px solid var(--border);">
+        <span>Total Tagihan:</span>
+        <span id="cart-total-display">Rp 0</span>
+      </div>
+
+      <div style="margin-top: 8px;">
+        <label>Metode Pembayaran</label>
+        <div class="pay-method-selector">
+          <div class="pay-tab active" id="tab-cash" onclick="setPaymentMethod('cash')">Tunai (Cash)</div>
+          <div class="pay-tab" id="tab-qris" onclick="setPaymentMethod('qris')">QRIS / Non-Tunai</div>
+        </div>
+      </div>
+
+      <!-- Area Tunai -->
+      <div id="cash-input-wrapper">
+        <div class="form-group" style="margin-top: 10px;">
+          <label>Uang Tunai Diterima (Rp)</label>
+          <input type="text" inputmode="numeric" id="cash-given" placeholder="0" oninput="handleCashInput(this)">
+        </div>
+
+        <label style="margin-bottom: 2px;">Pilihan Cepat Nominal:</label>
+        <div class="quick-cash-grid">
+          <button class="btn-quick-cash" onclick="setQuickCash('exact')">Uang Pas</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(5000)">5.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(10000)">10.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(20000)">20.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(50000)">50.000</button>
+          <button class="btn-quick-cash" onclick="setQuickCash(100000)">100.000</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700; margin-top:12px;">
+          <span>Uang Kembalian:</span>
+          <span id="cash-change-display">Rp 0</span>
+        </div>
+      </div>
+
+      <!-- Area QRIS -->
+      <div id="qris-wrapper">
+        <label style="color: var(--primary); margin-bottom: 6px;">Foto Bukti Pembayaran QRIS:</label>
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageCapture(event)">
+        <button type="button" class="btn-capture" onclick="document.getElementById('camera-input').click()">
+          Buka Kamera / Foto Bukti
+        </button>
+        <div>
+          <img id="qris-preview-img" alt="Pratinjau Bukti">
+        </div>
+      </div>
+
+      <div class="checkout-actions">
+        <button class="btn-action btn-save-only" onclick="processCheckout(false)">Simpan Saja</button>
+        <button class="btn-action btn-save-print" onclick="processCheckout(true)">Simpan & Cetak</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NOTA DIGITAL -->
+  <div id="receipt-modal" class="modal-backdrop" style="align-items: center;">
+    <div class="modal-dialog">
+      <div style="text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 17px;" id="modal-rec-shopname">VAN KASIR</h3>
+        <p style="font-size: 12px; color: var(--gray);" id="modal-rec-time"></p>
+        <span style="display:inline-block; font-size:11px; padding:2px 8px; border-radius:4px; margin-top:4px; font-weight:700; background:#e8f5e9; color:var(--primary);" id="modal-rec-method">TUNAI</span>
+      </div>
+      
+      <div id="modal-rec-items" style="max-height:160px; overflow-y:auto; margin: 10px 0; font-size: 13px; display:flex; flex-direction:column; gap:5px;"></div>
+      
+      <div style="border-top: 1px dashed var(--border); padding-top: 8px; font-size: 14px; display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px;">
+          <span>Total:</span><span id="modal-rec-total">Rp 0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--gray);">Diterima:</span><span id="modal-rec-cash">Rp 0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--accent);">
+          <span>Kembalian:</span><span id="modal-rec-change">Rp 0</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn-standard" style="width: 100%; padding: 12px;" onclick="closeReceiptModal()">Transaksi Baru / Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL LAPORAN -->
+  <div id="detail-modal" class="modal-backdrop" style="align-items: center;">
+    <div class="modal-dialog">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
+        <h3 style="font-size: 16px;">Rincian Transaksi</h3>
+        <button style="border:none; background:#eee; border-radius:50%; width:26px; height:26px; font-weight:800;" onclick="closeDetailModal()">&times;</button>
+      </div>
+
+      <div style="margin-top:10px; font-size:13px; display:flex; flex-direction:column; gap:4px;">
+        <div><b>Waktu:</b> <span id="dtl-time"></span></div>
+        <div><b>Kasir:</b> <span id="dtl-cashier" style="font-weight:700;"></span></div>
+        <div><b>Metode:</b> <span id="dtl-method" style="font-weight:700; color:var(--primary);"></span></div>
+      </div>
+
+      <div id="dtl-items" style="margin:10px 0; max-height:140px; overflow-y:auto; border-top:1px dashed #eee; border-bottom:1px dashed #eee; padding:6px 0; font-size:13px;"></div>
+
+      <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:800;">
+        <span>Total Bayar:</span>
+        <span id="dtl-total">Rp 0</span>
+      </div>
+
+      <div id="dtl-photo-container" style="margin-top:12px; display:none; text-align:center;">
+        <label style="font-size:12px; color:var(--primary); font-weight:700; margin-bottom:4px; display:block;">
+          Sentuh Foto untuk Memperbesar:
+        </label>
+        <img id="dtl-photo" style="max-width:100%; max-height:160px; border-radius:8px; border:2px solid var(--primary); object-fit:contain; cursor:pointer;" alt="Bukti QRIS" onclick="zoomPhoto(this.src)">
+      </div>
+
+      <button class="btn-standard" style="width:100%; margin-top:14px; background:#616161;" onclick="closeDetailModal()">Tutup</button>
+    </div>
+  </div>
+
+  <!-- ZOOM FOTO MODAL -->
+  <div id="image-zoom-modal" onclick="closeZoomModal()">
+    <img id="image-zoom-target" src="" alt="Zoom Foto">
+    <span style="color:white; font-size:13px; margin-top:12px; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:16px;">Ketuk di mana saja untuk menutup</span>
+  </div>
+
+  <!-- NAV BAWAH -->
+  <nav>
+    <button class="nav-btn active" onclick="navigate('kasir')">
+      <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      Kasir
+    </button>
+    <button class="nav-btn" onclick="navigate('produk')">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      Produk
+    </button>
+    <button class="nav-btn" onclick="navigate('laporan')">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      Laporan
+    </button>
+    <button class="nav-btn" onclick="navigate('setting')">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Data
+    </button>
+  </nav>
+
+  <!-- STRUK CETAK THERMAL 58MM (NAMA KASIR TIDAK DICETAK SESUAI INSTRUKSI) -->
+  <div id="receipt-area">
+    <div style="text-align: center; margin-bottom: 4px;">
+      <h2 style="font-size: 14px; margin: 0;" id="print-shop-name">VAN KASIR</h2>
+      <p style="font-size: 11px; margin: 0;" id="rec-datetime"></p>
+      <p style="font-size: 10px; margin: 0;" id="rec-paytype"></p>
+    </div>
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+    <div id="rec-items"></div>
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+    <div style="display: flex; justify-content: space-between;"><span>Total:</span><span id="rec-total"></span></div>
+    <div style="display: flex; justify-content: space-between;"><span>Bayar:</span><span id="rec-cash"></span></div>
+    <div style="display: flex; justify-content: space-between;"><span>Kembali:</span><span id="rec-change"></span></div>
+    <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+    <div style="text-align: center; margin-top: 4px; font-size: 10px;">Terima Kasih!</div>
+  </div>
+
+  <script>
+    /* 1. SERVICE WORKER */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          };
+        };
+      }).catch(console.error);
+    }
+
+    async function hardClearCache() {
+      if (confirm('Perbarui dan bersihkan cache aplikasi? (Data penjualan tetap aman)')) {
+        if ('caches' in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let reg of registrations) {
+            await reg.unregister();
+          }
+        }
+        window.location.reload(true);
+      }
+    }
+
+    /* 2. AUTHENTICATION & SESSION MANAGEMENT */
+    let currentUser = null;
+
+    function initAuth() {
+      let users = JSON.parse(localStorage.getItem('vk_users') || '[]');
+      if (users.length === 0) {
+        users = [
+          { username: 'admin', password: 'admin', role: 'admin', name: 'Administrator' }
+        ];
+        localStorage.setItem('vk_users', JSON.stringify(users));
+      }
+
+      const activeSession = sessionStorage.getItem('vk_current_user');
+      if (activeSession) {
+        currentUser = JSON.parse(activeSession);
+        applyUserSession();
+      } else {
+        showLoginModal();
+      }
+    }
+
+    function showLoginModal() {
+      document.getElementById('login-modal').style.display = 'flex';
+    }
+
+    function handleLogin() {
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+      const users = JSON.parse(localStorage.getItem('vk_users') || '[]');
+
+      const found = users.find(user => user.username === u && user.password === p);
+      if (found) {
+        currentUser = found;
+        sessionStorage.setItem('vk_current_user', JSON.stringify(found));
+        document.getElementById('login-modal').style.display = 'none';
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+        applyUserSession();
+      } else {
+        alert('Username atau password salah!');
+      }
+    }
+
+    function logout() {
+      if (confirm('Keluar dari sesi saat ini?')) {
+        sessionStorage.removeItem('vk_current_user');
+        currentUser = null;
+        location.reload();
+      }
+    }
+
+    function applyUserSession() {
+      document.getElementById('current-user-badge').textContent = `${currentUser.name} (${currentUser.role})`;
+      const adminSection = document.getElementById('admin-user-card');
+      if (currentUser.role === 'admin') {
+        adminSection.style.display = 'block';
+        renderUserTable();
+      } else {
+        adminSection.style.display = 'none';
+      }
+    }
+
+    function addUserAccount() {
+      const u = document.getElementById('new-user-username').value.trim();
+      const p = document.getElementById('new-user-password').value.trim();
+      const n = document.getElementById('new-user-fullname').value.trim();
+
+      if (!u || !p || !n) return alert('Semua kolom user kasir wajib diisi!');
+
+      const users = JSON.parse(localStorage.getItem('vk_users') || '[]');
+      if (users.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+        return alert('Username sudah digunakan, pilih username lain!');
+      }
+
+      users.push({ username: u, password: p, role: 'kasir', name: n });
+      localStorage.setItem('vk_users', JSON.stringify(users));
+
+      document.getElementById('new-user-username').value = '';
+      document.getElementById('new-user-password').value = '';
+      document.getElementById('new-user-fullname').value = '';
+      renderUserTable();
+      alert('User kasir berhasil ditambahkan!');
+    }
+
+    function renderUserTable() {
+      const users = JSON.parse(localStorage.getItem('vk_users') || '[]');
+      const tbody = document.getElementById('user-table-body');
+      tbody.innerHTML = users.map((u, i) => `
+        <tr>
+          <td><b>${u.username}</b> (${u.role})</td>
+          <td>${u.name}</td>
+          <td>
+            ${u.username === 'admin' ? '<small style="color:gray;">Bawaan</small>' : `<button class="btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteUser(${i})">Hapus</button>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteUser(idx) {
+      const users = JSON.parse(localStorage.getItem('vk_users') || '[]');
+      if (confirm(`Hapus kasir ${users[idx].name}?`)) {
+        users.splice(idx, 1);
+        localStorage.setItem('vk_users', JSON.stringify(users));
+        renderUserTable();
+      }
+    }
+
+    /* 3. NAMA TEMPAT JUALAN / CABANG */
+    function getShopName() {
+      return localStorage.getItem('vk_shop_name') || 'VAN KASIR';
+    }
+
+    function saveShopName() {
+      const val = document.getElementById('shop-name-input').value.trim();
+      if (!val) return alert('Nama tempat jualan tidak boleh kosong!');
+      localStorage.setItem('vk_shop_name', val);
+      alert('Nama tempat jualan berhasil disimpan!');
+    }
+
+    /* 4. NOTIFIKASI UNDUH LAPORAN PAGI (JAM 07.00+) */
+    function checkMorningReminder() {
+      const now = new Date();
+      const currentHour = now.getHours();
+      
+      const todayStr = now.toISOString().slice(0, 10);
+      const downloadKey = 'vk_downloaded_' + todayStr;
+      const alreadyDownloaded = localStorage.getItem(downloadKey);
+
+      const banner = document.getElementById('morning-alert-banner');
+      if (currentHour >= 7 && !alreadyDownloaded) {
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    async function downloadYesterdayReport() {
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yStr = yesterday.toDateString();
+
+      const allSales = await getAllFromStore('sales');
+      const salesYesterday = allSales.filter(s => new Date(s.timestamp).toDateString() === yStr);
+
+      const totalOmset = salesYesterday.reduce((acc, curr) => acc + curr.totalOmset, 0);
+      const reportPayload = {
+        tanggalUnduh: now.toISOString(),
+        periodeLaporan: yesterday.toISOString().slice(0, 10),
+        totalTransaksi: salesYesterday.length,
+        totalOmset: totalOmset,
+        transaksi: salesYesterday
+      };
+
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const dateFormatted = `${yyyy}-${mm}-${dd}`;
+      
+      const fileName = `LAP_${dateFormatted}_${dateFormatted}_.json`;
+
+      const blob = new Blob([JSON.stringify(reportPayload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
+      a.click();
+
+      const todayStr = now.toISOString().slice(0, 10);
+      localStorage.setItem('vk_downloaded_' + todayStr, 'true');
+      checkMorningReminder();
+      alert('Laporan berhasil diunduh: ' + fileName);
+    }
+
+    /* 5. INDEXEDDB */
+    let db;
+    const request = indexedDB.open('OfflineVanPOS', 2);
+
+    request.onupgradeneeded = (e) => {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains('products')) {
+        db.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains('sales')) {
+        db.createObjectStore('sales', { keyPath: 'id', autoIncrement: true });
+      }
+    };
+
+    request.onsuccess = (e) => {
+      db = e.target.result;
+      initAuth();
+      initCategories();
+      checkMorningReminder();
+      document.getElementById('shop-name-input').value = getShopName();
+      renderPosProducts();
+    };
+
+    function getTransaction(storeName, mode) {
+      return db.transaction(storeName, mode).objectStore(storeName);
+    }
+    function getAllFromStore(storeName) {
+      return new Promise(resolve => {
+        const req = getTransaction(storeName, 'readonly').getAll();
+        req.onsuccess = () => resolve(req.result || []);
+      });
+    }
+    function addItemToStore(storeName, item) {
+      return new Promise(resolve => {
+        const req = getTransaction(storeName, 'readwrite').add(item);
+        req.onsuccess = () => resolve(req.result);
+      });
+    }
+    function updateItemInStore(storeName, item) {
+      return new Promise(resolve => {
+        const req = getTransaction(storeName, 'readwrite').put(item);
+        req.onsuccess = () => resolve(req.result);
+      });
+    }
+    function deleteItemFromStore(storeName, id) {
+      return new Promise(resolve => {
+        const req = getTransaction(storeName, 'readwrite').delete(id);
+        req.onsuccess = () => resolve();
+      });
+    }
+
+    /* 6. MANAJEMEN KATEGORI */
+    let activeCategory = 'Semua';
+
+    function getCategories() {
+      const cats = localStorage.getItem('vk_categories');
+      return cats ? JSON.parse(cats) : ['Semua', 'Makanan', 'Minuman', 'Paket'];
+    }
+
+    function initCategories() {
+      const cats = getCategories();
+      renderCategoryUI(cats);
+    }
+
+    function addCategory() {
+      const val = document.getElementById('new-category-name').value.trim();
+      if (!val) return alert('Nama kategori wajib diisi!');
+      const cats = getCategories();
+      if (cats.some(c => c.toLowerCase() === val.toLowerCase())) {
+        return alert('Kategori sudah ada!');
+      }
+      cats.push(val);
+      localStorage.setItem('vk_categories', JSON.stringify(cats));
+      document.getElementById('new-category-name').value = '';
+      initCategories();
+    }
+
+    function removeCategory(cat) {
+      if (cat === 'Semua') return;
+      if (confirm(`Hapus kategori "${cat}"?`)) {
+        let cats = getCategories().filter(c => c !== cat);
+        localStorage.setItem('vk_categories', JSON.stringify(cats));
+        if (activeCategory === cat) activeCategory = 'Semua';
+        initCategories();
+        renderPosProducts();
+      }
+    }
+
+    function renderCategoryUI(cats) {
+      const scroll = document.getElementById('pos-category-chips');
+      scroll.innerHTML = cats.map(c => `
+        <div class="cat-chip ${c === activeCategory ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
+      `).join('');
+
+      const select = document.getElementById('prod-category');
+      select.innerHTML = cats.filter(c => c !== 'Semua').map(c => `<option value="${c}">${c}</option>`).join('');
+
+      const badgeList = document.getElementById('category-badge-list');
+      badgeList.innerHTML = cats.filter(c => c !== 'Semua').map(c => `
+        <span style="background:#e0e0e0; padding:4px 8px; border-radius:6px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
+          ${c} <b style="cursor:pointer; color:red;" onclick="removeCategory('${c}')">&times;</b>
+        </span>
+      `).join('');
+    }
+
+    function selectCategory(cat) {
+      activeCategory = cat;
+      initCategories();
+      renderPosProducts();
+    }
+
+    /* 7. NAVIGASI */
+    function navigate(sec) {
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById('section-' + sec);
+      if (target) {
+        target.classList.add('active');
+        const titles = { kasir: 'Van Kasir', produk: 'Kelola Produk', laporan: 'Laporan Penjualan', setting: 'Cadangan & Data' };
+        document.getElementById('page-title').textContent = titles[sec] || 'Kasir';
+
+        const idx = ['kasir', 'produk', 'laporan', 'setting'].indexOf(sec);
+        if (idx !== -1) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+
+        if (sec === 'kasir') renderPosProducts();
+        if (sec === 'produk') renderProductTable();
+        if (sec === 'laporan') loadReportData();
+        if (sec === 'setting') {
+          document.getElementById('shop-name-input').value = getShopName();
+          if (currentUser && currentUser.role === 'admin') renderUserTable();
+        }
+      }
+    }
+
+    /* 8. FORMAT & KAS */
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    function unformatNumber(str) {
+      return parseInt(str.toString().replace(/\./g, '')) || 0;
+    }
+
+    function handleCashInput(input) {
+      const raw = unformatNumber(input.value);
+      input.value = raw > 0 ? formatNumber(raw) : '';
+      calcChange();
+    }
+
+    let paymentMethod = 'cash';
+    let currentQrisPhoto = null;
+
+    function setPaymentMethod(method) {
+      paymentMethod = method;
+      document.getElementById('tab-cash').classList.toggle('active', method === 'cash');
+      document.getElementById('tab-qris').classList.toggle('active', method === 'qris');
+      
+      const cashWrapper = document.getElementById('cash-input-wrapper');
+      const qrisWrapper = document.getElementById('qris-wrapper');
+
+      if (method === 'qris') {
+        cashWrapper.style.display = 'none';
+        qrisWrapper.style.display = 'block';
+      } else {
+        cashWrapper.style.display = 'block';
+        qrisWrapper.style.display = 'none';
+        calcChange();
+      }
+    }
+
+    function handleImageCapture(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 800;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          currentQrisPhoto = canvas.toDataURL('image/jpeg', 0.7);
+
+          const prev = document.getElementById('qris-preview-img');
+          prev.src = currentQrisPhoto;
+          prev.style.display = 'inline-block';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setQuickCash(val) {
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      let target = val === 'exact' ? total : val;
+      document.getElementById('cash-given').value = target > 0 ? formatNumber(target) : '';
+      calcChange();
+    }
+
+    /* 9. CRUD PRODUK */
+    async function saveProduct() {
+      const id = document.getElementById('prod-id').value;
+      const name = document.getElementById('prod-name').value.trim();
+      const category = document.getElementById('prod-category').value;
+      const price = parseInt(document.getElementById('prod-price').value) || 0;
+
+      if (!name || price <= 0) return alert('Nama produk dan harga jual wajib diisi!');
+
+      if (id) {
+        await updateItemInStore('products', { id: parseInt(id), name, category, price });
+      } else {
+        await addItemToStore('products', { name, category, price });
+      }
+      resetProductForm();
+      renderProductTable();
+    }
+
+    function resetProductForm() {
+      document.getElementById('prod-id').value = '';
+      document.getElementById('prod-name').value = '';
+      document.getElementById('prod-price').value = '';
+    }
+
+    async function editProduct(id) {
+      const prods = await getAllFromStore('products');
+      const p = prods.find(i => i.id === id);
+      if (p) {
+        document.getElementById('prod-id').value = p.id;
+        document.getElementById('prod-name').value = p.name;
+        document.getElementById('prod-category').value = p.category || 'Makanan';
+        document.getElementById('prod-price').value = p.price;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (confirm('Hapus produk ini?')) {
+        await deleteItemFromStore('products', id);
+        renderProductTable();
+      }
+    }
+
+    async function renderProductTable() {
+      const prods = await getAllFromStore('products');
+      const tbody = document.getElementById('product-table-body');
+      tbody.innerHTML = '';
+      if (prods.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--gray); padding:20px;">Belum ada produk terdaftar.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = prods.map(p => `
+        <tr>
+          <td><b>${p.name}</b></td>
+          <td><span style="font-size:12px; background:#eee; padding:2px 6px; border-radius:4px;">${p.category || '-'}</span></td>
+          <td>Rp ${p.price.toLocaleString('id-ID')}</td>
+          <td>
+            <button class="btn-standard" style="padding:4px 8px; font-size:12px;" onclick="editProduct(${p.id})">Edit</button>
+            <button class="btn-danger" style="padding:4px 8px; font-size:12px;" onclick="deleteProduct(${p.id})">Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /* 10. KASIR & TRANSAKSI */
+    let cart = [];
+    let currentSearchKeyword = '';
+
+    function handleSearch(keyword) {
+      currentSearchKeyword = keyword.toLowerCase().trim();
+      renderPosProducts();
+    }
+
+    function clearCurrentCart() {
+      if (cart.length === 0) return;
+      if (confirm('Kosongkan keranjang pesanan ini?')) {
+        cart = [];
+        closePaymentModal();
+        renderPosProducts();
+      }
+    }
+
+    async function renderPosProducts() {
+      const prods = await getAllFromStore('products');
+      const container = document.getElementById('pos-products');
+      
+      if (prods.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px 10px; color:var(--gray); font-size:14px;">Belum ada produk dagangan.<br>Silakan buka tab <b>Produk</b> untuk menambahkannya.</div>';
+        updateCartViews();
+        return;
+      }
+
+      let filtered = prods.filter(p => p.name.toLowerCase().includes(currentSearchKeyword));
+      if (activeCategory !== 'Semua') {
+        filtered = filtered.filter(p => p.category === activeCategory);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 30px 10px; color:var(--gray); font-size:13px;">Produk tidak ditemukan.</div>';
+        updateCartViews();
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => {
+        const itemInCart = cart.find(c => c.id === p.id);
+        const qtyBadge = itemInCart ? `<span class="badge-qty">${itemInCart.qty}</span>` : '';
+        return `
+          <div class="card-product" onclick='addToCart(${JSON.stringify(p)})'>
+            ${qtyBadge}
+            <div>
+              <div class="name">${p.name}</div>
+              <div class="cat-tag">${p.category || ''}</div>
+            </div>
+            <div class="price">Rp ${p.price.toLocaleString('id-ID')}</div>
+          </div>
+        `;
+      }).join('');
+
+      updateCartViews();
+    }
+
+    function addToCart(p) {
+      const item = cart.find(i => i.id === p.id);
+      if (item) item.qty += 1;
+      else cart.push({ ...p, qty: 1 });
+      renderPosProducts();
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+      renderPosProducts();
+      if (cart.length === 0) closePaymentModal();
+    }
+
+    function updateCartViews() {
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      const totalCount = cart.reduce((s, i) => s + i.qty, 0);
+
+      const floatingBar = document.getElementById('floating-cart-bar');
+      if (cart.length > 0) {
+        floatingBar.style.display = 'flex';
+        document.getElementById('floating-cart-count').textContent = totalCount + ' Item';
+        document.getElementById('floating-cart-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+      } else {
+        floatingBar.style.display = 'none';
+      }
+
+      const container = document.getElementById('cart-list');
+      container.innerHTML = cart.map(i => {
+        const sub = i.price * i.qty;
+        return `
+          <div class="cart-row">
+            <div>
+              <b>${i.name}</b>
+              <div style="font-size:12px; color:var(--gray);">@ Rp ${i.price.toLocaleString('id-ID')}</div>
+            </div>
+            <div class="cart-qty-ctrl">
+              <button class="btn-circle" onclick="changeQty(${i.id}, -1)">-</button>
+              <span style="font-weight:700; width:20px; text-align:center;">${i.qty}</span>
+              <button class="btn-circle" onclick="changeQty(${i.id}, 1)">+</button>
+              <span style="font-weight:700; width:70px; text-align:right;">Rp ${sub.toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('cart-total-display').textContent = 'Rp ' + total.toLocaleString('id-ID');
+      calcChange();
+    }
+
+    function calcChange() {
+      const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      const cash = unformatNumber(document.getElementById('cash-given').value);
+      const change = cash - total;
+      const el = document.getElementById('cash-change-display');
+      el.textContent = cash >= total && total > 0 ? 'Rp ' + formatNumber(change) : 'Rp 0';
+      el.style.color = cash >= total && total > 0 ? 'var(--primary)' : 'var(--danger)';
+    }
+
+    function openPaymentModal() {
+      if (cart.length === 0) return;
+      document.getElementById('payment-modal').style.display = 'flex';
+      calcChange();
+    }
+
+    function closePaymentModal() {
+      document.getElementById('payment-modal').style.display = 'none';
+    }
+
+    async function processCheckout(printReceipt = true) {
+      if (cart.length === 0) return alert('Keranjang masih kosong!');
+      const totalOmset = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      
+      let cashGiven = 0;
+      let cashChange = 0;
+
+      if (paymentMethod === 'cash') {
+        cashGiven = unformatNumber(document.getElementById('cash-given').value);
+        if (cashGiven < totalOmset) return alert('Uang pembayaran masih kurang!');
+        cashChange = cashGiven - totalOmset;
+      } else {
+        cashGiven = totalOmset;
+        cashChange = 0;
+      }
+
+      const cashierName = currentUser ? currentUser.name : 'Kasir';
+      const shopName = getShopName();
+
+      const sale = {
+        timestamp: new Date().toISOString(),
+        cashier: cashierName,
+        paymentMethod: paymentMethod.toUpperCase(),
+        items: [...cart],
+        totalOmset,
+        cashGiven,
+        cashChange,
+        qrisPhoto: currentQrisPhoto
+      };
+
+      await addItemToStore('sales', sale);
+      closePaymentModal();
+
+      if (printReceipt) {
+        document.getElementById('print-shop-name').textContent = shopName;
+        document.getElementById('rec-datetime').textContent = new Date().toLocaleString('id-ID');
+        document.getElementById('rec-paytype').textContent = `[${sale.paymentMethod}]`;
+        document.getElementById('rec-items').innerHTML = sale.items.map(i => `
+          <div style="display:flex; justify-content:space-between;">
+            <span>${i.name} x${i.qty}</span>
+            <span>${(i.price * i.qty).toLocaleString('id-ID')}</span>
+          </div>
+        `).join('');
+        document.getElementById('rec-total').textContent = 'Rp ' + sale.totalOmset.toLocaleString('id-ID');
+        document.getElementById('rec-cash').textContent = 'Rp ' + sale.cashGiven.toLocaleString('id-ID');
+        document.getElementById('rec-change').textContent = 'Rp ' + sale.cashChange.toLocaleString('id-ID');
+
+        document.body.className = 'printing-receipt';
+        window.print();
+        document.body.className = '';
+        resetPOS();
+      } else {
+        showReceiptModal(sale);
+      }
+    }
+
+    function showReceiptModal(sale) {
+      document.getElementById('modal-rec-shopname').textContent = getShopName();
+      document.getElementById('modal-rec-time').textContent = new Date().toLocaleString('id-ID');
+      document.getElementById('modal-rec-method').textContent = sale.paymentMethod;
+      document.getElementById('modal-rec-items').innerHTML = sale.items.map(i => `
+        <div style="display:flex; justify-content:space-between;">
+          <span>${i.name} <b>x${i.qty}</b></span>
+          <span>Rp ${(i.price * i.qty).toLocaleString('id-ID')}</span>
+        </div>
+      `).join('');
+      document.getElementById('modal-rec-total').textContent = 'Rp ' + sale.totalOmset.toLocaleString('id-ID');
+      document.getElementById('modal-rec-cash').textContent = 'Rp ' + sale.cashGiven.toLocaleString('id-ID');
+      document.getElementById('modal-rec-change').textContent = 'Rp ' + sale.cashChange.toLocaleString('id-ID');
+
+      document.getElementById('receipt-modal').style.display = 'flex';
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').style.display = 'none';
+      resetPOS();
+    }
+
+    function resetPOS() {
+      cart = [];
+      document.getElementById('cash-given').value = '';
+      currentQrisPhoto = null;
+      document.getElementById('qris-preview-img').style.display = 'none';
+      document.getElementById('qris-preview-img').src = '';
+      setPaymentMethod('cash');
+      renderPosProducts();
+    }
+
+    /* 11. LAPORAN DENGAN NAMA KASIR */
+    async function loadReportData() {
+      const type = document.getElementById('report-type').value;
+      const allSales = await getAllFromStore('sales');
+      const now = new Date();
+
+      const filtered = allSales.filter(s => {
+        const d = new Date(s.timestamp);
+        if (type === 'today') return d.toDateString() === now.toDateString();
+        if (type === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        if (type === 'year') return d.getFullYear() === now.getFullYear();
+        return true;
+      });
+
+      const titleMap = { today: 'Laporan Penjualan Hari Ini', month: 'Laporan Penjualan Bulan Ini', year: 'Laporan Penjualan Tahun Ini' };
+      document.getElementById('report-title-display').textContent = titleMap[type] || 'Laporan Penjualan';
+      document.getElementById('rep-count').textContent = filtered.length;
+
+      const itemCounts = {};
+      filtered.forEach(s => {
+        s.items.forEach(i => {
+          itemCounts[i.name] = (itemCounts[i.name] || 0) + i.qty;
+        });
+      });
+      drawDonutChart(itemCounts);
+
+      const groups = {};
+      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
+        const dateKey = new Date(s.timestamp).toLocaleDateString('id-ID', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(s);
+      });
+
+      const tbody = document.getElementById('report-table-body');
+      tbody.innerHTML = '';
+
+      if (Object.keys(groups).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--gray); padding:20px;">Belum ada transaksi pada periode ini.</td></tr>';
+        return;
+      }
+
+      for (const [dateLabel, salesInDate] of Object.entries(groups)) {
+        let dailyTotal = 0;
+
+        tbody.innerHTML += `
+          <tr class="group-header">
+            <td colspan="5">${dateLabel}</td>
+          </tr>
+        `;
+
+        salesInDate.forEach(s => {
+          dailyTotal += s.totalOmset;
+          const desc = s.items.map(i => `${i.name} (${i.qty})`).join(', ');
+          const timeOnly = new Date(s.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+          const hasPhotoIcon = s.qrisPhoto ? ' 📷' : '';
+          const cashierName = s.cashier || 'Kasir';
+
+          tbody.innerHTML += `
+            <tr class="clickable-row" onclick="viewTransactionDetail(${s.id})" style="cursor:pointer;">
+              <td>${timeOnly}</td>
+              <td><b>${cashierName}</b></td>
+              <td><span style="font-size:11px; padding:2px 4px; border-radius:4px; font-weight:700; background:#eee;">${s.paymentMethod || 'TUNAI'}${hasPhotoIcon}</span></td>
+              <td>${desc}</td>
+              <td>Rp ${s.totalOmset.toLocaleString('id-ID')}</td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML += `
+          <tr class="group-footer">
+            <td colspan="4" style="text-align:right;">Subtotal:</td>
+            <td><b>Rp ${dailyTotal.toLocaleString('id-ID')}</b></td>
+          </tr>
+        `;
+      }
+    }
+
+    async function viewTransactionDetail(saleId) {
+      const allSales = await getAllFromStore('sales');
+      const sale = allSales.find(s => s.id === saleId);
+      if (!sale) return;
+
+      document.getElementById('dtl-time').textContent = new Date(sale.timestamp).toLocaleString('id-ID');
+      document.getElementById('dtl-cashier').textContent = sale.cashier || 'Kasir';
+      document.getElementById('dtl-method').textContent = sale.paymentMethod;
+      document.getElementById('dtl-total').textContent = 'Rp ' + sale.totalOmset.toLocaleString('id-ID');
+
+      const itemsBox = document.getElementById('dtl-items');
+      itemsBox.innerHTML = sale.items.map(i => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>${i.name} <b>x${i.qty}</b></span>
+          <span>Rp ${(i.price * i.qty).toLocaleString('id-ID')}</span>
+        </div>
+      `).join('');
+
+      const photoContainer = document.getElementById('dtl-photo-container');
+      const photoEl = document.getElementById('dtl-photo');
+
+      if (sale.qrisPhoto) {
+        photoEl.src = sale.qrisPhoto;
+        photoContainer.style.display = 'block';
+      } else {
+        photoEl.src = '';
+        photoContainer.style.display = 'none';
+      }
+
+      document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detail-modal').style.display = 'none';
+    }
+
+    function zoomPhoto(src) {
+      if (!src) return;
+      document.getElementById('image-zoom-target').src = src;
+      document.getElementById('image-zoom-modal').style.display = 'flex';
+    }
+
+    function closeZoomModal() {
+      document.getElementById('image-zoom-modal').style.display = 'none';
+    }
+
+    function drawDonutChart(counts) {
+      const canvas = document.getElementById('pieChart');
+      const ctx = canvas.getContext('2d');
+      const legendBox = document.getElementById('pie-legend');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      legendBox.innerHTML = '';
+
+      const labels = Object.keys(counts);
+      const values = Object.values(counts);
+      const total = values.reduce((a, b) => a + b, 0);
+
+      if (total === 0) {
+        ctx.fillStyle = '#9e9e9e';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Belum ada penjualan', canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      const colors = ['#2e7d32', '#ff8f00', '#1976d2', '#d32f2f', '#7b1fa2', '#0097a7', '#5d4037'];
+      let startAngle = 0;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 80;
+
+      labels.forEach((label, idx) => {
+        const sliceAngle = (values[idx] / total) * 2 * Math.PI;
+        const color = colors[idx % colors.length];
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+        ctx.arc(centerX, centerY, 40, startAngle + sliceAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        startAngle += sliceAngle;
+
+        const percent = Math.round((values[idx] / total) * 100);
+        legendBox.innerHTML += `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:14px; height:14px; border-radius:3px; background:${color}; display:inline-block;"></span>
+              <b>${label}</b>
+            </div>
+            <span>${values[idx]} item (${percent}%)</span>
+          </div>
+        `;
+      });
+    }
+
+    function printReportPDF() {
+      document.body.className = 'printing-report';
+      window.print();
+      document.body.className = '';
+    }
+
+    /* 12. RESET DATA & CADANGAN */
+    async function resetProductsData() {
+      if (!confirm('PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA produk yang ada?')) {
+        return;
+      }
+
+      const tx = db.transaction('products', 'readwrite');
+      const store = tx.objectStore('products');
+      const req = store.clear();
+
+      req.onsuccess = () => {
+        cart = [];
+        alert('Semua produk berhasil dihapus bersih!');
+        renderProductTable();
+        renderPosProducts();
+      };
+
+      req.onerror = (e) => {
+        alert('Gagal menghapus data produk: ' + e.target.error);
+      };
+    }
+
+    async function resetSalesData() {
+      const confirm1 = confirm('PERINGATAN: Apakah Anda yakin ingin menghapus SEMUA data transaksi penjualan?');
+      if (!confirm1) return;
+
+      const confirm2 = prompt('Ketik "RESET" dengan huruf besar untuk mengonfirmasi:');
+      if (confirm2 === 'RESET') {
+        const tx = db.transaction('sales', 'readwrite');
+        const req = tx.objectStore('sales').clear();
+        req.onsuccess = () => {
+          alert('Semua riwayat transaksi berhasil dihapus menjadi nol.');
+          loadReportData();
+        };
+      } else {
+        alert('Konfirmasi dibatalkan.');
+      }
+    }
+
+    async function exportDataBackup() {
+      const products = await getAllFromStore('products');
+      const sales = await getAllFromStore('sales');
+      const categories = getCategories();
+      const shopName = getShopName();
+      const users = JSON.parse(localStorage.getItem('vk_users') || '[]');
+
+      const backupObj = { products, sales, categories, shopName, users };
+      const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `backup_vankasir_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+    }
+
+    async function importDataBackup() {
+      const input = document.getElementById('import-file');
+      if (!input.files.length) return alert('Pilih file .json terlebih dahulu!');
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.products && data.sales) {
+            if (confirm('Pulihkan data ini? Data yang lama akan diganti.')) {
+              const txP = db.transaction('products', 'readwrite');
+              txP.objectStore('products').clear();
+              data.products.forEach(p => txP.objectStore('products').add(p));
+
+              const txS = db.transaction('sales', 'readwrite');
+              txS.objectStore('sales').clear();
+              data.sales.forEach(s => txS.objectStore('sales').add(s));
+
+              if (data.categories) localStorage.setItem('vk_categories', JSON.stringify(data.categories));
+              if (data.shopName) localStorage.setItem('vk_shop_name', data.shopName);
+              if (data.users) localStorage.setItem('vk_users', JSON.stringify(data.users));
+
+              alert('Data berhasil dipulihkan!');
+              location.reload();
+            }
+          }
+        } catch (err) { alert('Format file rusak!'); }
+      };
+      reader.readAsText(input.files[0]);
+    }
+  </script>
+</body>
+</html>
